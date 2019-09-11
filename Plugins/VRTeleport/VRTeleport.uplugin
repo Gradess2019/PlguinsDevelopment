@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "VRTeleport",
+	"Description": "Player teleport for VR projects",
+	"Category": "Other",
+	"CreatedBy": "Stepan",
+	"CreatedByURL": "marta.pictures",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "VRTeleport",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
