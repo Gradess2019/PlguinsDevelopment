@@ -38,7 +38,8 @@ public class VRTeleport : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "HeadMountedDisplay"
+                "HeadMountedDisplay",
+                "NavigationSystem"
             }
             );
 		
