@@ -38,9 +38,9 @@ public class VRTeleport : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
-			}
-			);
+                "HeadMountedDisplay"
+            }
+            );
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(
