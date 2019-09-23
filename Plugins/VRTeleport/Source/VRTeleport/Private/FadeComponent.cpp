@@ -6,6 +6,13 @@
 UFadeComponent::UFadeComponent()
 {
 	bWantsBeginPlay = true;
+
+	FadeInSettings.ToAlpha = 1.f;
+	FadeInSettings.Duration = 0.3f;
+
+	FadeOutSettings.FromAlpha = 1.f;
+	FadeOutSettings.ToAlpha = 0.f;
+	FadeOutSettings.Duration = 0.3f;
 }
 
 void UFadeComponent::BeginPlay()
