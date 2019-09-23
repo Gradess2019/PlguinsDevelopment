@@ -20,12 +20,6 @@ UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALI
 		
 	splineComponent = InitializeCustomComponent<USplineComponent>(OBJECT_INITIALIZER, "SplineTrajectory");
 	InitializeTeleportLocationComponent(OBJECT_INITIALIZER);
-
-	if (useFade)
-	{
-		FadeComponent = InitializeCustomComponent<UFadeComponent>(OBJECT_INITIALIZER, "FadeCmponent");
-		owner->AddInstanceComponent(FadeComponent.Get());
-	}
 }
 
 void UTeleportComponent::InitializePathParams()
@@ -125,6 +119,10 @@ void UTeleportComponent::BeginPlay()
 
 	if (useFade)
 	{
+		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
+
+		if (!FadeComponent.IsValid()) checkNoEntry();
+
 		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetActorLocation);
 	}
 }
@@ -287,8 +285,11 @@ void UTeleportComponent::StartTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		projectionTimeline->PlayFromStart();
-		ShowComponent(teleportLocationComponent.Get());
+		if (IsFadePlaying())
+		{
+			projectionTimeline->PlayFromStart();
+			ShowComponent(teleportLocationComponent.Get());
+		}
 	} else
 	{
 		checkNoEntry();
@@ -312,8 +313,11 @@ void UTeleportComponent::StopTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		projectionTimeline->Stop();
-		HideComponent(teleportLocationComponent.Get());
+		if (IsFadePlaying())
+		{
+			projectionTimeline->Stop();
+			HideComponent(teleportLocationComponent.Get());
+		}
 	}
 	else
 	{
@@ -341,6 +345,10 @@ FVector UTeleportComponent::CalculateLocation()
 
 		return RESULT_LOCATION;
 	}
-
 	return owner->GetActorLocation();
+}
+
+bool UTeleportComponent::IsFadePlaying()
+{
+	return !useFade || useFade && !FadeComponent->IsPlaying();
 }

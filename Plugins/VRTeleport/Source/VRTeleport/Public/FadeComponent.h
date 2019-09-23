@@ -18,6 +18,8 @@ class VRTELEPORT_API UFadeComponent : public UActorComponent
 
 public:
 
+	UFadeComponent();
+
 	UPROPERTY(BlueprintAssignable, Category = "FadeComponent")
 	FFadeInStarted OnFadeInStartedDelegate;
 	
@@ -43,6 +45,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "FadeComponent")
 	void FadeOut();
+
+	UFUNCTION(BlueprintCallable, Category = "FadeComponent")
+	bool IsPlaying();
+
 
 protected:
 

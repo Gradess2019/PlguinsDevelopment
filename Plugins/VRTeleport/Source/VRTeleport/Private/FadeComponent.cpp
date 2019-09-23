@@ -3,6 +3,11 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 
+UFadeComponent::UFadeComponent()
+{
+	bWantsBeginPlay = true;
+}
+
 void UFadeComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -30,6 +35,9 @@ void UFadeComponent::ClearTimers()
 
 void UFadeComponent::FadeIn()
 {
+	FullFade.Invalidate();
+	FadeOutFinishedTimer.Invalidate();
+	
 	Fade(FadeInSettings);
 	OnFadeInStartedDelegate.Broadcast();
 	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeInFinished, FadeInSettings.Duration);
@@ -37,9 +45,17 @@ void UFadeComponent::FadeIn()
 
 void UFadeComponent::FadeOut()
 {
+	FullFade.Invalidate();
+	FadeInFinishedTimer.Invalidate();
+
 	Fade(FadeOutSettings);
 	OnFadeOutStartedDelegate.Broadcast();
 	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeOutFinished, FadeOutSettings.Duration);
+}
+
+bool UFadeComponent::IsPlaying()
+{
+	return FullFade.IsValid() || FadeInFinishedTimer.IsValid() || FadeOutFinishedTimer.IsValid();
 }
 
 void UFadeComponent::Fade(const FFadeSettings& FADE_SETTINGS)

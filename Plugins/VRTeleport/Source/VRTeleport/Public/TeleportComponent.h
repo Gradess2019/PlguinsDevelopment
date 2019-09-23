@@ -144,5 +144,7 @@ private:
 	void SetActorLocation();
 
 	FVector CalculateLocation();
+
+	bool IsFadePlaying();
 };
 
