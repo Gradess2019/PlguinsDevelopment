@@ -8,6 +8,8 @@
 #include "Components/SplineMeshComponent.h"
 #include "Kismet/GameplayStaticsTypes.h"
 #include "Components/SplineComponent.h"
+#include "FadeComponent.h"
+#include "TimerManager.h"
 #include "TeleportComponent.generated.h"
 
 
@@ -38,6 +40,9 @@ protected:
 	bool autoEnable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	bool useFade;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
 	bool useOnlyNavigation;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
@@ -45,9 +50,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings", meta = (EditCondition = "useOnlyNavigation"))
 	FVector queryExtent;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
-	bool isLeft;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
 	FPredictProjectilePathParams projectilePathParams;
@@ -81,6 +83,12 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
+
+	UPROPERTY()
+	TWeakObjectPtr<UFadeComponent> FadeComponent;
+
+	FTimerHandle TeleportHandle;
+	FTimerDelegate TeleportDelegate;
 	
 	void InitializePathParams();
 	void InitializeController();
@@ -131,5 +139,10 @@ private:
 
 	UFUNCTION()
 	void StopTeleportProjection();
+
+	UFUNCTION()
+	void SetActorLocation();
+
+	FVector CalculateLocation();
 };
 

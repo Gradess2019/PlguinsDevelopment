@@ -8,6 +8,7 @@
 #include "NavigationSystem.h"
 #include "Engine/StaticMesh.h"
 #include "HeadMountedDisplayTypes.h"
+#include "TimerManager.h"
 
 UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALIZER) : Super(OBJECT_INITIALIZER)
 {
@@ -19,6 +20,12 @@ UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALI
 		
 	splineComponent = InitializeCustomComponent<USplineComponent>(OBJECT_INITIALIZER, "SplineTrajectory");
 	InitializeTeleportLocationComponent(OBJECT_INITIALIZER);
+
+	if (useFade)
+	{
+		FadeComponent = InitializeCustomComponent<UFadeComponent>(OBJECT_INITIALIZER, "FadeCmponent");
+		owner->AddInstanceComponent(FadeComponent.Get());
+	}
 }
 
 void UTeleportComponent::InitializePathParams()
@@ -35,7 +42,6 @@ void UTeleportComponent::InitializePathParams()
 void UTeleportComponent::InitializeController()
 {
 	this->bDisplayDeviceModel = true;
-	this->SetTrackingSource(isLeft ? EControllerHand::Left : EControllerHand::Right);
 	this->bDisableLowLatencyUpdate = true;
 
 	if (trajectoryMesh == nullptr)
@@ -116,6 +122,11 @@ void UTeleportComponent::BeginPlay()
 
 	owner = GetOwner();
 	projectilePathParams.ActorsToIgnore.Add(owner.Get());
+
+	if (useFade)
+	{
+		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetActorLocation);
+	}
 }
 
 void UTeleportComponent::InitializeTimeline()
@@ -288,19 +299,12 @@ void UTeleportComponent::Teleport()
 {
 	StopTeleportProjection();
 	DestroyTrajectory();
-
-	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
+	if (useFade)
 	{
-		const FVector OWNER_LOCATION = owner->GetActorLocation();
-
-		const FVector RESULT_LOCATION = FVector(
-			lastTeleportLocation.X,
-			lastTeleportLocation.Y,
-			lastTeleportLocation.Z + OWNER_LOCATION.Z
-		);
-
-		UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(0, EOrientPositionSelector::Position);
-		owner->SetActorLocation(RESULT_LOCATION);
+		FadeComponent->StartFade();
+	} else
+	{
+		SetActorLocation();
 	}
 }
 
@@ -315,4 +319,28 @@ void UTeleportComponent::StopTeleportProjection()
 	{
 		checkNoEntry();
 	}
+}
+
+void UTeleportComponent::SetActorLocation()
+{
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(0, EOrientPositionSelector::Position);
+	owner->SetActorLocation(CalculateLocation());
+}
+
+FVector UTeleportComponent::CalculateLocation()
+{
+	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
+	{
+		const FVector OWNER_LOCATION = owner->GetActorLocation();
+
+		const FVector RESULT_LOCATION = FVector(
+			lastTeleportLocation.X,
+			lastTeleportLocation.Y,
+			lastTeleportLocation.Z + OWNER_LOCATION.Z
+		);
+
+		return RESULT_LOCATION;
+	}
+
+	return owner->GetActorLocation();
 }
