@@ -42,9 +42,6 @@ void UFadeComponent::ClearTimers()
 
 void UFadeComponent::FadeIn()
 {
-	FullFade.Invalidate();
-	FadeOutFinishedTimer.Invalidate();
-	
 	Fade(FadeInSettings);
 	OnFadeInStartedDelegate.Broadcast();
 	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeInFinished, FadeInSettings.Duration);
@@ -52,9 +49,6 @@ void UFadeComponent::FadeIn()
 
 void UFadeComponent::FadeOut()
 {
-	FullFade.Invalidate();
-	FadeInFinishedTimer.Invalidate();
-
 	Fade(FadeOutSettings);
 	OnFadeOutStartedDelegate.Broadcast();
 	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeOutFinished, FadeOutSettings.Duration);
@@ -62,7 +56,12 @@ void UFadeComponent::FadeOut()
 
 bool UFadeComponent::IsPlaying()
 {
-	return FullFade.IsValid() || FadeInFinishedTimer.IsValid() || FadeOutFinishedTimer.IsValid();
+	return IsTimerPlaying(FullFade) || IsTimerPlaying(FadeInFinishedTimer) || IsTimerPlaying(FadeOutFinishedTimer);
+}
+
+bool UFadeComponent::IsTimerPlaying(const FTimerHandle& TimerHandle)
+{
+	return GetWorld()->GetTimerManager().IsTimerActive(TimerHandle);
 }
 
 void UFadeComponent::Fade(const FFadeSettings& FADE_SETTINGS)
@@ -79,7 +78,7 @@ void UFadeComponent::Fade(const FFadeSettings& FADE_SETTINGS)
 
 void UFadeComponent::OnFadeInFinished()
 {
-	OnFadeInFinishedDelegate.Broadcast();
+	//OnFadeInFinishedDelegate.Broadcast();
 }
 
 void UFadeComponent::OnFadeOutFinished()

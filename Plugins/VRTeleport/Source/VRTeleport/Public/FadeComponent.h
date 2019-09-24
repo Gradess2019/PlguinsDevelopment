@@ -80,5 +80,7 @@ private:
 	void OnFadeOutFinished();
 
 	void ClearTimers();
+
+	bool IsTimerPlaying(const FTimerHandle& TimerHandle);
 };
 

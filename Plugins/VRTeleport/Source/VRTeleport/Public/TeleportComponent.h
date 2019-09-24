@@ -82,7 +82,7 @@ private:
 	TWeakObjectPtr<USplineComponent> splineComponent;
 
 	UPROPERTY()
-	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
+	UStaticMeshComponent* teleportLocationComponent;
 
 	UPROPERTY()
 	TWeakObjectPtr<UFadeComponent> FadeComponent;
@@ -112,7 +112,7 @@ private:
 	UFUNCTION()
 	void SetupSpline(TArray<FVector>& pathPositions);
 
-	//UFUNCTION()
+	UFUNCTION()
 	void DrawTrajectory(TArray<FVector>& pathPositions);
 
 	UFUNCTION()
@@ -141,7 +141,7 @@ private:
 	void StopTeleportProjection();
 
 	UFUNCTION()
-	void SetActorLocation();
+	void SetOwnerLocation();
 
 	FVector CalculateLocation();
 

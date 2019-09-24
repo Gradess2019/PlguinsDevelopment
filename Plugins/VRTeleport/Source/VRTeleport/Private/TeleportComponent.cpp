@@ -9,6 +9,7 @@
 #include "Engine/StaticMesh.h"
 #include "HeadMountedDisplayTypes.h"
 #include "TimerManager.h"
+#include "Engine/Engine.h"
 
 UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALIZER) : Super(OBJECT_INITIALIZER)
 {
@@ -63,6 +64,11 @@ T* UTeleportComponent::InitializeCustomComponent(const FObjectInitializer& OBJEC
 void UTeleportComponent::InitializeTeleportLocationComponent(const FObjectInitializer& OBJECT_INITIALIZER)
 {
 	teleportLocationComponent = InitializeCustomComponent<UStaticMeshComponent>(OBJECT_INITIALIZER, "TeleportLocationMesh", false);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Yellow, (teleportLocationComponent == nullptr ? TEXT("NULL") : TEXT("TRUE")));
+	}
 
 	if (teleportLocationMesh == nullptr)
 	{
@@ -119,11 +125,13 @@ void UTeleportComponent::BeginPlay()
 
 	if (useFade)
 	{
-		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
+		//FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
+		//GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("CREATED!"));
 
-		if (!FadeComponent.IsValid()) checkNoEntry();
-
-		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetActorLocation);
+		//if (!FadeComponent.IsValid()) checkNoEntry();
+		
+		//FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetActorLocation);
+		//UE_LOG(LogTemp, Warning, TEXT("Binded"));
 	}
 }
 
@@ -152,12 +160,14 @@ void UTeleportComponent::UpdateProjectionLocation()
 	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
 	{
 		SetupSpline(positions);
+		
 		DrawTrajectory(positions);
-		ShowComponent(teleportLocationComponent.Get());
+		
+		ShowComponent(teleportLocationComponent);
 		SetTeleportLocations();
 	} else
 	{
-		HideComponent(teleportLocationComponent.Get());
+		HideComponent(teleportLocationComponent);
 	}
 }
 
@@ -288,7 +298,7 @@ void UTeleportComponent::StartTeleportProjection()
 		if (IsFadePlaying())
 		{
 			projectionTimeline->PlayFromStart();
-			ShowComponent(teleportLocationComponent.Get());
+			ShowComponent(teleportLocationComponent);
 		}
 	} else
 	{
@@ -300,12 +310,18 @@ void UTeleportComponent::Teleport()
 {
 	StopTeleportProjection();
 	DestroyTrajectory();
-	if (useFade)
+	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
 	{
-		FadeComponent->StartFade();
-	} else
-	{
-		SetActorLocation();
+		if (useFade)
+		{
+			//FadeComponent->StartFade();
+		}
+		else
+		{
+			SetOwnerLocation();
+		}
+		
+		lastHitResult.bBlockingHit = false;
 	}
 }
 
@@ -316,7 +332,7 @@ void UTeleportComponent::StopTeleportProjection()
 		if (IsFadePlaying())
 		{
 			projectionTimeline->Stop();
-			HideComponent(teleportLocationComponent.Get());
+			HideComponent(teleportLocationComponent);
 		}
 	}
 	else
@@ -325,30 +341,28 @@ void UTeleportComponent::StopTeleportProjection()
 	}
 }
 
-void UTeleportComponent::SetActorLocation()
+void UTeleportComponent::SetOwnerLocation()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("SetActorLocation"));
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(0, EOrientPositionSelector::Position);
 	owner->SetActorLocation(CalculateLocation());
+	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("TELEPORT"));
 }
 
 FVector UTeleportComponent::CalculateLocation()
 {
-	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
-	{
-		const FVector OWNER_LOCATION = owner->GetActorLocation();
+	const FVector OWNER_LOCATION = owner->GetActorLocation();
 
-		const FVector RESULT_LOCATION = FVector(
-			lastTeleportLocation.X,
-			lastTeleportLocation.Y,
-			lastTeleportLocation.Z + OWNER_LOCATION.Z
-		);
+	const FVector RESULT_LOCATION = FVector(
+		lastTeleportLocation.X,
+		lastTeleportLocation.Y,
+		lastTeleportLocation.Z + OWNER_LOCATION.Z
+	);
 
-		return RESULT_LOCATION;
-	}
-	return owner->GetActorLocation();
+	return RESULT_LOCATION;
 }
 
 bool UTeleportComponent::IsFadePlaying()
 {
-	return !useFade || useFade && !FadeComponent->IsPlaying();
+	return !useFade || useFade && FadeComponent.IsValid() && !FadeComponent->IsPlaying();
 }
