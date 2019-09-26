@@ -10,6 +10,7 @@
 #include "HeadMountedDisplayTypes.h"
 #include "TimerManager.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
 
 UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALIZER) : Super(OBJECT_INITIALIZER)
 {
@@ -49,7 +50,7 @@ void UTeleportComponent::InitializeController()
 
 void UTeleportComponent::LoadTrajectoryMesh()
 {
-	trajectoryMesh = LoadMesh("StaticMesh'/VRTeleport/SM_TeleportTrajectory.SM_TeleportTrajectory'");
+	trajectoryMesh = LoadMesh("StaticMesh'/VRPack/SM_TeleportTrajectory.SM_TeleportTrajectory'");
 }
 
 template <typename T>
@@ -75,7 +76,7 @@ void UTeleportComponent::InitializeTeleportLocationComponent()
 
 void UTeleportComponent::LoadTeleportLocationMesh()
 {
-	teleportLocationMesh = LoadMesh("StaticMesh'/VRTeleport/SM_TeleportLocation.SM_TeleportLocation'");
+	teleportLocationMesh = LoadMesh("StaticMesh'/VRPack/SM_TeleportLocation.SM_TeleportLocation'");
 }
 
 UStaticMesh* UTeleportComponent::LoadMesh(const FString& path)
@@ -106,7 +107,8 @@ void UTeleportComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	owner = GetOwner();
-
+	owner->GetActorBounds(true, *new FVector(), OwnerExtent);
+	
 	InitializeTeleportLocationComponent();
 	splineComponent = NewObject<USplineComponent>(this, "TrajectorySplineComponent");
 	splineComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -123,6 +125,11 @@ void UTeleportComponent::BeginPlay()
 		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
 		if (!FadeComponent.IsValid()) checkNoEntry();
 		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetOwnerLocation);
+	}
+
+	if (autoEnable)
+	{
+		StartTeleportProjection();
 	}
 }
 
@@ -284,7 +291,7 @@ void UTeleportComponent::StartTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		if (!IsFadeFinished())
+		if (IsFadeFinished())
 		{
 			projectionTimeline->PlayFromStart();
 			ShowComponent(teleportLocationComponent.Get());
@@ -293,6 +300,11 @@ void UTeleportComponent::StartTeleportProjection()
 	{
 		checkNoEntry();
 	}
+}
+
+bool UTeleportComponent::IsFadeFinished()
+{
+	return !useFade || useFade && FadeComponent.IsValid() && !FadeComponent->IsPlaying();
 }
 
 void UTeleportComponent::Teleport()
@@ -335,18 +347,12 @@ void UTeleportComponent::SetOwnerLocation()
 
 FVector UTeleportComponent::CalculateLocation()
 {
-	const FVector OWNER_LOCATION = owner->GetActorLocation();
-
-	const FVector RESULT_LOCATION = FVector(
+	const FVector Result_Location = FVector(
 		lastTeleportLocation.X,
 		lastTeleportLocation.Y,
-		lastTeleportLocation.Z + OWNER_LOCATION.Z
+		lastTeleportLocation.Z + OwnerExtent.Z
 	);
 
-	return RESULT_LOCATION;
+	return Result_Location;
 }
 
-bool UTeleportComponent::IsFadeFinished()
-{
-	return !useFade || useFade && FadeComponent.IsValid() && FadeComponent->IsPlaying();
-}

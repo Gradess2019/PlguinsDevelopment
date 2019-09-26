@@ -14,7 +14,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class VRTELEPORT_API UTeleportComponent : public UMotionControllerComponent
+class VRPACK_API UTeleportComponent : public UMotionControllerComponent
 {
 	GENERATED_BODY()
 
@@ -84,10 +84,12 @@ private:
 	UPROPERTY()
 	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
 
-	int uniqueId;
-	
 	UPROPERTY()
 	TWeakObjectPtr<UFadeComponent> FadeComponent;
+
+	int uniqueId;
+
+	FVector OwnerExtent;
 
 	FTimerHandle TeleportHandle;
 	FTimerDelegate TeleportDelegate;

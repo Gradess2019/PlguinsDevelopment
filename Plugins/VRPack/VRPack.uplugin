@@ -2,8 +2,8 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "VRTeleport",
-	"Description": "Player teleport for VR projects",
+	"FriendlyName": "VRPack",
+	"Description": "A pack of useful VR components",
 	"Category": "Other",
 	"CreatedBy": "Stepan",
 	"CreatedByURL": "marta.pictures",
@@ -11,11 +11,11 @@
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
+	"IsBetaVersion": true,
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "VRTeleport",
+			"Name": "VRPack",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

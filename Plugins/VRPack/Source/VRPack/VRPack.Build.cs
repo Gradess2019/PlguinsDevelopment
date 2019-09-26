@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class VRTeleport : ModuleRules
+public class VRPack : ModuleRules
 {
-	public VRTeleport(ReadOnlyTargetRules Target) : base(Target)
+	public VRPack(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
