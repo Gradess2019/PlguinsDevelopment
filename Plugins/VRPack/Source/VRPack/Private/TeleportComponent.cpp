@@ -49,7 +49,7 @@ void UTeleportComponent::InitializeController()
 
 void UTeleportComponent::LoadTrajectoryMesh()
 {
-	trajectoryMesh = LoadMesh("StaticMesh'/VRTeleport/SM_TeleportTrajectory.SM_TeleportTrajectory'");
+	trajectoryMesh = LoadMesh("StaticMesh'/VRPack/SM_TeleportTrajectory.SM_TeleportTrajectory'");
 }
 
 template <typename T>
@@ -75,7 +75,7 @@ void UTeleportComponent::InitializeTeleportLocationComponent()
 
 void UTeleportComponent::LoadTeleportLocationMesh()
 {
-	teleportLocationMesh = LoadMesh("StaticMesh'/VRTeleport/SM_TeleportLocation.SM_TeleportLocation'");
+	teleportLocationMesh = LoadMesh("StaticMesh'/VRPack/SM_TeleportLocation.SM_TeleportLocation'");
 }
 
 UStaticMesh* UTeleportComponent::LoadMesh(const FString& path)

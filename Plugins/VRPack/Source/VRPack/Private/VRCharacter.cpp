@@ -8,7 +8,7 @@ AVRCharacter::AVRCharacter(const FObjectInitializer& OBJECT_INITIALIZER) : Super
 	teleportButtonActionMapping = "Teleport";
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	
-	VROrigin = InitializeCustomComponent<USceneComponent>(OBJECT_INITIALIZER, "CameraRoot", false);
+	VROrigin = InitializeCustomComponent<USceneComponent>(OBJECT_INITIALIZER, "VROrigin", false);
 	VROrigin->SetupAttachment(GetMesh());
 	
 	teleportComponent = InitializeCustomComponent<UTeleportComponent>(OBJECT_INITIALIZER, "TeleportComponent");

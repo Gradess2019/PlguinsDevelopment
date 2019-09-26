@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FVRTeleportModule : public IModuleInterface
+class FVRPackModule : public IModuleInterface
 {
 public:
 

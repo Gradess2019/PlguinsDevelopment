@@ -8,7 +8,7 @@
 #include "VRCharacter.generated.h"
 
 UCLASS()
-class VRTELEPORT_API AVRCharacter : public ACharacter
+class VRPACK_API AVRCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

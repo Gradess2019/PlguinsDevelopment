@@ -14,7 +14,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class VRTELEPORT_API UTeleportComponent : public UMotionControllerComponent
+class VRPACK_API UTeleportComponent : public UMotionControllerComponent
 {
 	GENERATED_BODY()
 
