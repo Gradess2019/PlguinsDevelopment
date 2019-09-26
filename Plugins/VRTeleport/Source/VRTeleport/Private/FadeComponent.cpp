@@ -26,7 +26,7 @@ void UFadeComponent::StartFade()
 	if (!CameraManager.IsValid()) checkNoEntry();
 
 	FadeIn();
-	GetWorld()->GetTimerManager().SetTimer(FullFade, this, &UFadeComponent::FadeOut, FadeInSettings.Duration);
+	GetWorld()->GetTimerManager().SetTimer(FullFade, this, &UFadeComponent::FadeOut, FadeInSettings.Duration + 0.05);
 }
 
 void UFadeComponent::StopFade()
@@ -44,14 +44,14 @@ void UFadeComponent::FadeIn()
 {
 	Fade(FadeInSettings);
 	OnFadeInStartedDelegate.Broadcast();
-	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeInFinished, FadeInSettings.Duration);
+	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeInFinished, 0.3);
 }
 
 void UFadeComponent::FadeOut()
 {
 	Fade(FadeOutSettings);
 	OnFadeOutStartedDelegate.Broadcast();
-	GetWorld()->GetTimerManager().SetTimer(FadeInFinishedTimer, this, &UFadeComponent::OnFadeOutFinished, FadeOutSettings.Duration);
+	GetWorld()->GetTimerManager().SetTimer(FadeOutFinishedTimer, this, &UFadeComponent::OnFadeOutFinished, 0.3);
 }
 
 bool UFadeComponent::IsPlaying()
@@ -78,7 +78,7 @@ void UFadeComponent::Fade(const FFadeSettings& FADE_SETTINGS)
 
 void UFadeComponent::OnFadeInFinished()
 {
-	//OnFadeInFinishedDelegate.Broadcast();
+	OnFadeInFinishedDelegate.Broadcast();
 }
 
 void UFadeComponent::OnFadeOutFinished()

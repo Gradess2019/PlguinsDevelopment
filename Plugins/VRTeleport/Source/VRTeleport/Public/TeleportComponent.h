@@ -82,8 +82,10 @@ private:
 	TWeakObjectPtr<USplineComponent> splineComponent;
 
 	UPROPERTY()
-	UStaticMeshComponent* teleportLocationComponent;
+	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
 
+	int uniqueId;
+	
 	UPROPERTY()
 	TWeakObjectPtr<UFadeComponent> FadeComponent;
 
@@ -97,7 +99,7 @@ private:
 	template<typename T>
 	T* InitializeCustomComponent(const FObjectInitializer& OBJECT_INITIALIZER, const FName& COMPONENT_NAME, bool attachToParent = true);
 
-	void InitializeTeleportLocationComponent(const FObjectInitializer& OBJECT_INITIALIZER);
+	void InitializeTeleportLocationComponent();
 	void LoadTeleportLocationMesh();
 	UStaticMesh* LoadMesh(const FString& path);
 	void SetTeleportLocationMesh() const;
@@ -130,7 +132,6 @@ private:
 	UFUNCTION()
 	void SetTeleportLocations();
 	
-
 	void DestroyTrajectory();
 	void InitializeTrajectory();
 
@@ -145,6 +146,6 @@ private:
 
 	FVector CalculateLocation();
 
-	bool IsFadePlaying();
+	bool IsFadeFinished();
 };
 

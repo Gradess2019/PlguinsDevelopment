@@ -19,8 +19,10 @@ UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALI
 	InitializePathParams();
 	InitializeController();
 		
-	splineComponent = InitializeCustomComponent<USplineComponent>(OBJECT_INITIALIZER, "SplineTrajectory");
-	InitializeTeleportLocationComponent(OBJECT_INITIALIZER);
+	if (teleportLocationMesh == nullptr)
+	{
+		LoadTeleportLocationMesh();
+	}
 }
 
 void UTeleportComponent::InitializePathParams()
@@ -61,19 +63,10 @@ T* UTeleportComponent::InitializeCustomComponent(const FObjectInitializer& OBJEC
 	return newComponent;
 }
 
-void UTeleportComponent::InitializeTeleportLocationComponent(const FObjectInitializer& OBJECT_INITIALIZER)
+void UTeleportComponent::InitializeTeleportLocationComponent()
 {
-	teleportLocationComponent = InitializeCustomComponent<UStaticMeshComponent>(OBJECT_INITIALIZER, "TeleportLocationMesh", false);
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Yellow, (teleportLocationComponent == nullptr ? TEXT("NULL") : TEXT("TRUE")));
-	}
-
-	if (teleportLocationMesh == nullptr)
-	{
-		LoadTeleportLocationMesh();
-	}
+	teleportLocationComponent = NewObject<UStaticMeshComponent>(this, "TeleportLocationMesh");
+	teleportLocationComponent->RegisterComponent();
 	
 	SetTeleportLocationMesh();
 	teleportLocationComponent->SetHiddenInGame(true, true);
@@ -112,26 +105,24 @@ void UTeleportComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	projectionTimeline = NewObject<UTimelineComponent>(this, "ProjectionTimeline");
-	InitializeTimeline();
-
-	if (autoEnable)
-	{
-		StartTeleportProjection();
-	}
-
 	owner = GetOwner();
+
+	InitializeTeleportLocationComponent();
+	splineComponent = NewObject<USplineComponent>(this, "TrajectorySplineComponent");
+	splineComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	splineComponent->RegisterComponent();
+	
 	projectilePathParams.ActorsToIgnore.Add(owner.Get());
 
-	if (useFade)
-	{
-		//FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
-		//GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("CREATED!"));
+	projectionTimeline = NewObject<UTimelineComponent>(this, "ProjectionTimeline");
+	projectionTimeline->RegisterComponent();
+	InitializeTimeline();
 
-		//if (!FadeComponent.IsValid()) checkNoEntry();
-		
-		//FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetActorLocation);
-		//UE_LOG(LogTemp, Warning, TEXT("Binded"));
+	if (useFade)
+	{ 
+		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
+		if (!FadeComponent.IsValid()) checkNoEntry();
+		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetOwnerLocation);
 	}
 }
 
@@ -145,8 +136,6 @@ void UTeleportComponent::InitializeTimeline()
 	updateEvent.BindUFunction(this, "UpdateProjectionLocation");
 
 	projectionTimeline->SetTimelinePostUpdateFunc(updateEvent);
-	
-	projectionTimeline->RegisterComponent();
 }
 
 void UTeleportComponent::UpdateProjectionLocation()
@@ -163,12 +152,27 @@ void UTeleportComponent::UpdateProjectionLocation()
 		
 		DrawTrajectory(positions);
 		
-		ShowComponent(teleportLocationComponent);
+		ShowComponent(teleportLocationComponent.Get());
 		SetTeleportLocations();
 	} else
 	{
-		HideComponent(teleportLocationComponent);
+		HideComponent(teleportLocationComponent.Get());
 	}
+}
+
+void UTeleportComponent::DestroyTrajectory()
+{
+	for (int id = 0; id < splineMeshes.Num(); id++)
+	{
+		splineMeshes[id]->DestroyComponent(true);
+	}
+	splineMeshes.Empty();
+}
+
+void UTeleportComponent::InitializeTrajectory()
+{
+	projectilePathParams.StartLocation = this->GetComponentLocation();
+	projectilePathParams.LaunchVelocity = this->GetForwardVector() * projectileVelocity;
 }
 
 bool UTeleportComponent::IsSuitableObjectType()
@@ -189,21 +193,6 @@ void UTeleportComponent::DrawTrajectory(TArray<FVector>& pathPositions)
 	}
 }
 
-void UTeleportComponent::DestroyTrajectory()
-{
-	for (int id = 0; id < splineMeshes.Num(); id++)
-	{
-		splineMeshes[id]->DestroyComponent(true);
-	}
-	splineMeshes.Empty();
-}
-
-void UTeleportComponent::InitializeTrajectory()
-{
-	projectilePathParams.StartLocation = this->GetComponentLocation();
-	projectilePathParams.LaunchVelocity = this->GetForwardVector() * projectileVelocity;
-}
-
 void UTeleportComponent::CreateSplineMesh(TArray<FVector>& pathPositions, int id)
 {
 	const FVector CURRENT_LOCATION = pathPositions[id - 1];
@@ -212,7 +201,7 @@ void UTeleportComponent::CreateSplineMesh(TArray<FVector>& pathPositions, int id
 	const FVector START_TANGENT = GetPointTangent(id - 1);
 	const FVector END_TANGENT = GetPointTangent(id);
 
-	USplineMeshComponent* splineMesh = NewObject<USplineMeshComponent>(this, *(FString("SplineMeshComponent") + FString::FromInt(id - 1)));
+	USplineMeshComponent* splineMesh = NewObject<USplineMeshComponent>(this, *(FString("SplineMeshComponent") + FString::FromInt(uniqueId++)));
 	splineMesh->SetMobility(EComponentMobility::Movable);
 	splineMesh->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 	splineMesh->SetStaticMesh(trajectoryMesh);
@@ -295,10 +284,10 @@ void UTeleportComponent::StartTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		if (IsFadePlaying())
+		if (!IsFadeFinished())
 		{
 			projectionTimeline->PlayFromStart();
-			ShowComponent(teleportLocationComponent);
+			ShowComponent(teleportLocationComponent.Get());
 		}
 	} else
 	{
@@ -314,7 +303,7 @@ void UTeleportComponent::Teleport()
 	{
 		if (useFade)
 		{
-			//FadeComponent->StartFade();
+			FadeComponent->StartFade();
 		}
 		else
 		{
@@ -329,11 +318,8 @@ void UTeleportComponent::StopTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		if (IsFadePlaying())
-		{
-			projectionTimeline->Stop();
-			HideComponent(teleportLocationComponent);
-		}
+		projectionTimeline->Stop();
+		HideComponent(teleportLocationComponent.Get());
 	}
 	else
 	{
@@ -343,10 +329,8 @@ void UTeleportComponent::StopTeleportProjection()
 
 void UTeleportComponent::SetOwnerLocation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("SetActorLocation"));
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(0, EOrientPositionSelector::Position);
 	owner->SetActorLocation(CalculateLocation());
-	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, TEXT("TELEPORT"));
 }
 
 FVector UTeleportComponent::CalculateLocation()
@@ -362,7 +346,7 @@ FVector UTeleportComponent::CalculateLocation()
 	return RESULT_LOCATION;
 }
 
-bool UTeleportComponent::IsFadePlaying()
+bool UTeleportComponent::IsFadeFinished()
 {
-	return !useFade || useFade && FadeComponent.IsValid() && !FadeComponent->IsPlaying();
+	return !useFade || useFade && FadeComponent.IsValid() && FadeComponent->IsPlaying();
 }
