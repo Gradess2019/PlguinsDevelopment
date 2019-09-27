@@ -1,6 +1,16 @@
 #include "HeightChangerComponent.h"
 #include "Components/SceneComponent.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/KismetMathLibrary.h"
+
+UHeightChangerComponent::UHeightChangerComponent()
+{
+	HeightCoefficient = 100.f;
+	Increment = 0.25f;
+	Decrement = 0.25f;
+	MaxHeight = 200.f;
+	MinHeight = 130.f;
+}
 
 void UHeightChangerComponent::Raise()
 {
@@ -14,8 +24,11 @@ void UHeightChangerComponent::Lower()
 
 void UHeightChangerComponent::SetCustomHeight(float NewHeight)
 {
+	NewHeight = UKismetMathLibrary::FClamp(NewHeight, MinHeight, MaxHeight);
+
 	const FVector ComponentLocation = TargetComponent->RelativeLocation;
-	const FVector TargetLocation = FVector(ComponentLocation.X, ComponentLocation.Y, NewHeight);
+	const FVector TargetLocation = FVector(ComponentLocation.X, ComponentLocation.Y, NewHeight - HeightCoefficient);
+
 	TargetComponent->SetRelativeLocation(TargetLocation);
 	CurrentHeight = NewHeight;
 }
@@ -30,9 +43,19 @@ void UHeightChangerComponent::SetDecrement(const float NewDecrement)
 	Decrement = NewDecrement;
 }
 
-float UHeightChangerComponent::GetHeight()
+float UHeightChangerComponent::GetHeight() const
 {
 	return CurrentHeight;
+}
+
+float UHeightChangerComponent::GetMaxHeight() const
+{
+	return MaxHeight;
+}
+
+float UHeightChangerComponent::GetMinHeight() const
+{
+	return MinHeight;
 }
 
 void UHeightChangerComponent::BeginPlay()
@@ -43,11 +66,10 @@ void UHeightChangerComponent::BeginPlay()
 
 	if (TargetComponent.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Component valid"));
-		CurrentHeight = TargetComponent->RelativeLocation.Z;
-	}
-	else
+		SetCustomHeight(TargetComponent->RelativeLocation.Z + HeightCoefficient);
+	} else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Component INVALID!"));
+		checkNoEntry();
 	}
+	
 }

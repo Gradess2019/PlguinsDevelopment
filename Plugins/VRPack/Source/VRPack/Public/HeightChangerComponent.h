@@ -14,6 +14,8 @@ class VRPACK_API UHeightChangerComponent : public UActorComponent
 
 public:
 
+	UHeightChangerComponent();
+	
 	UFUNCTION(BlueprintCallable, Category = "Height changer component")
 	void Raise();
 	
@@ -29,8 +31,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Height changer component")
 	void SetDecrement(float NewDecrement);
 
-	UFUNCTION(BlueprintCallable, Category = "Height changer component")
-	float GetHeight();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Height changer component")
+	float GetHeight() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Height changer component")
+	float GetMaxHeight() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Height changer component")
+	float GetMinHeight() const;
 
 protected:
 
@@ -43,12 +51,20 @@ protected:
 private:
 
 	float CurrentHeight;
+	float HeightCoefficient;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Changer settings")
 	float Increment;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Changer settings")
 	float Decrement;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Changer settings")
+	float MaxHeight;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Changer settings")
+	float MinHeight;
+
 
 	UFUNCTION()
 	void BeginPlay() override;

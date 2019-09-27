@@ -284,7 +284,7 @@ void UTeleportComponent::StartTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		if (!IsFadeFinished())
+		if (IsFadeFinished())
 		{
 			projectionTimeline->PlayFromStart();
 			ShowComponent(teleportLocationComponent.Get());
@@ -293,6 +293,11 @@ void UTeleportComponent::StartTeleportProjection()
 	{
 		checkNoEntry();
 	}
+}
+
+bool UTeleportComponent::IsFadeFinished()
+{
+	return !useFade || useFade && FadeComponent.IsValid() && !FadeComponent->IsPlaying();
 }
 
 void UTeleportComponent::Teleport()
@@ -346,7 +351,3 @@ FVector UTeleportComponent::CalculateLocation()
 	return RESULT_LOCATION;
 }
 
-bool UTeleportComponent::IsFadeFinished()
-{
-	return !useFade || useFade && FadeComponent.IsValid() && FadeComponent->IsPlaying();
-}
