@@ -10,6 +10,7 @@
 #include "HeadMountedDisplayTypes.h"
 #include "TimerManager.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
 
 UTeleportComponent::UTeleportComponent(const FObjectInitializer& OBJECT_INITIALIZER) : Super(OBJECT_INITIALIZER)
 {
@@ -106,7 +107,8 @@ void UTeleportComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	owner = GetOwner();
-
+	owner->GetActorBounds(true, *new FVector(), OwnerExtent);
+	
 	InitializeTeleportLocationComponent();
 	splineComponent = NewObject<USplineComponent>(this, "TrajectorySplineComponent");
 	splineComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -123,6 +125,11 @@ void UTeleportComponent::BeginPlay()
 		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
 		if (!FadeComponent.IsValid()) checkNoEntry();
 		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetOwnerLocation);
+	}
+
+	if (autoEnable)
+	{
+		StartTeleportProjection();
 	}
 }
 
@@ -340,14 +347,12 @@ void UTeleportComponent::SetOwnerLocation()
 
 FVector UTeleportComponent::CalculateLocation()
 {
-	const FVector OWNER_LOCATION = owner->GetActorLocation();
-
-	const FVector RESULT_LOCATION = FVector(
+	const FVector Result_Location = FVector(
 		lastTeleportLocation.X,
 		lastTeleportLocation.Y,
-		lastTeleportLocation.Z + OWNER_LOCATION.Z
+		lastTeleportLocation.Z + OwnerExtent.Z
 	);
 
-	return RESULT_LOCATION;
+	return Result_Location;
 }
 

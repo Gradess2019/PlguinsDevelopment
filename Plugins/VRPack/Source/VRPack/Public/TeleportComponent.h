@@ -84,10 +84,12 @@ private:
 	UPROPERTY()
 	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
 
-	int uniqueId;
-	
 	UPROPERTY()
 	TWeakObjectPtr<UFadeComponent> FadeComponent;
+
+	int uniqueId;
+
+	FVector OwnerExtent;
 
 	FTimerHandle TeleportHandle;
 	FTimerDelegate TeleportDelegate;
