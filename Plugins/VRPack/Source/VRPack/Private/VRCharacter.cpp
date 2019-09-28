@@ -5,14 +5,13 @@
 
 AVRCharacter::AVRCharacter(const FObjectInitializer& OBJECT_INITIALIZER) : Super(OBJECT_INITIALIZER)
 {
-	teleportButtonActionMapping = "Teleport";
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	
 	VROrigin = InitializeCustomComponent<USceneComponent>(OBJECT_INITIALIZER, "VROrigin", false);
 	VROrigin->SetupAttachment(GetMesh());
 	
-	teleportComponent = InitializeCustomComponent<UTeleportComponent>(OBJECT_INITIALIZER, "TeleportComponent");
-	cameraComponent = InitializeCustomComponent<UCameraComponent>(OBJECT_INITIALIZER, "CameraComponent");
+	TeleportComponent = InitializeCustomComponent<UTeleportComponent>(OBJECT_INITIALIZER, "TeleportComponent");
+	CameraComponent = InitializeCustomComponent<UCameraComponent>(OBJECT_INITIALIZER, "CameraComponent");
 	SetVROriginOffset();
 }
 
@@ -33,8 +32,11 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(teleportButtonActionMapping, EInputEvent::IE_Pressed, this, &AVRCharacter::OnTeleportButtonPressed);
-	PlayerInputComponent->BindAction(teleportButtonActionMapping, EInputEvent::IE_Released, this, &AVRCharacter::OnTeleportButtonReleased);
+	for (FInputChord TeleportationChord : TeleportationChords)
+	{
+		PlayerInputComponent->BindKey(TeleportationChord, EInputEvent::IE_Pressed, this, &AVRCharacter::OnTeleportButtonPressed);
+		PlayerInputComponent->BindKey(TeleportationChord, EInputEvent::IE_Released, this, &AVRCharacter::OnTeleportButtonReleased);
+	}
 }
 
 void AVRCharacter::BeginPlay()
@@ -52,11 +54,11 @@ void AVRCharacter::SetVROriginOffset()
 
 void AVRCharacter::OnTeleportButtonPressed()
 {
-	teleportComponent->StartTeleportProjection();
+	TeleportComponent->StartTeleportProjection();
 }
 
 void AVRCharacter::OnTeleportButtonReleased()
 {
-	teleportComponent->Teleport();
+	TeleportComponent->Teleport();
 }
 

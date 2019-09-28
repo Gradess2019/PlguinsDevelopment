@@ -5,6 +5,7 @@
 #include "MotionControllerComponent.h"
 #include "TeleportComponent.h"
 #include "Camera/CameraComponent.h"
+#include "InputChord.h"
 #include "VRCharacter.generated.h"
 
 UCLASS()
@@ -21,17 +22,17 @@ public:
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character settings")
-	UTeleportComponent* teleportComponent;
+	UTeleportComponent* TeleportComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character settings")
-	UCameraComponent* cameraComponent;
+	UCameraComponent* CameraComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character settings")
 	USceneComponent* VROrigin;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Character settings")
-	FName teleportButtonActionMapping;
-
+	TArray<FInputChord> TeleportationChords;
+	
 	UFUNCTION()
 	void BeginPlay() override;
 	
