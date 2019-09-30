@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VRPACK_API ULaserPointer : public USplineMeshComponent
 {
 	GENERATED_BODY()
@@ -24,7 +24,11 @@ public:
 
 private:
 
-	TArray<TEnumAsByte<ECollisionChannel>> objectChannels;
+	UPROPERTY(EditDefaultsOnly, Category = "Laser pointer settings")
+	TArray<TEnumAsByte<ECollisionChannel>> ObjectChannels;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Laser pointer settings")
+	TArray<AActor*> ActorsToIgnore;
 	
 	FCollisionObjectQueryParams ObjectQueryParams;
 
