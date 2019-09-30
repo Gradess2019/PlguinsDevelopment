@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Camera/PlayerCameraManager.h"
-#include "TeleportStructs.h"
+#include "VRPackStructs.h"
 #include "FadeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFadeInStarted);
