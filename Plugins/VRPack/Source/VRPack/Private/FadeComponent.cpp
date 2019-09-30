@@ -21,8 +21,9 @@ void UFadeComponent::BeginPlay()
 
 void UFadeComponent::StartFade()
 {
+#if !UE_BUILD_SHIPPING
 	if (!CameraManager.IsValid()) checkNoEntry();
-
+#endif
 	FadeIn();
 	GetWorld()->GetTimerManager().SetTimer(FullFade, this, &UFadeComponent::FadeOut, FadeInSettings.Duration + 0.05);
 }

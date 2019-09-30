@@ -123,7 +123,10 @@ void UTeleportComponent::BeginPlay()
 	if (useFade)
 	{ 
 		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
+
+#if !UE_BUILD_SHIPPING
 		if (!FadeComponent.IsValid()) checkNoEntry();
+#endif
 		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetOwnerLocation);
 	}
 

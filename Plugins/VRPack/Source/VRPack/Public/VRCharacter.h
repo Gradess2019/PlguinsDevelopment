@@ -5,7 +5,7 @@
 #include "MotionControllerComponent.h"
 #include "TeleportComponent.h"
 #include "Camera/CameraComponent.h"
-#include "InputChord.h"
+#include "Framework/Commands/InputChord.h"
 #include "VRCharacter.generated.h"
 
 UCLASS()
