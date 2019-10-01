@@ -29,7 +29,6 @@ void ULaserPointer::BeginPlay()
 		ObjectQueryParams.AddObjectTypesToQuery(ObjectChannel);
 	}
 
-	ActorsToIgnore.Add(GetOwner());
 	CollisionQueryParams.AddIgnoredActors(ActorsToIgnore);
 	CollisionQueryParams.bTraceComplex = true;
 }
@@ -54,5 +53,5 @@ void ULaserPointer::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void ULaserPointer::SetEnabled(bool bIsEnabled)
 {
-	SetHiddenInGame(bIsEnabled, true);
+	SetHiddenInGame(!bIsEnabled, true);
 }

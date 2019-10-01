@@ -18,8 +18,11 @@ class VRPACK_API ULaserPointer : public USplineMeshComponent
 public:
 
 	ULaserPointer();
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Laser pointer settings")
 	void EnableLaser();
+
+	UFUNCTION(BlueprintCallable, Category = "Laser pointer settings")
 	void DisableLaser();
 
 private:
