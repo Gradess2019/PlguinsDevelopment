@@ -12,25 +12,27 @@ class VRPACK_API APicture : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+
+	APicture(const FObjectInitializer& ObjectInitializer);
+
+	UFUNCTION(BlueprintCallable, Category = "Picture")
+	void InitializePicture(float PictureSliceSize, UStaticMesh* PictureMesh);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void Follow(FVector PointLocation);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
-	void InitializePicture(float SliceSize, UStaticMesh* Mesh);
-
-protected:
-	
-	void BeginPlay() override;
+	void CreateNewMesh(FVector PointLocation);
 	
 private:
-
 	
 	float SliceSize;
 
 	FVector LastDrewLocation;
 
+	UStaticMesh* Mesh;
+	
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
 	

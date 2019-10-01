@@ -313,7 +313,6 @@ bool UTeleportComponent::IsFadeFinished()
 void UTeleportComponent::Teleport()
 {
 	StopTeleportProjection();
-	DestroyTrajectory();
 	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
 	{
 		if (useFade)
@@ -331,6 +330,8 @@ void UTeleportComponent::Teleport()
 
 void UTeleportComponent::StopTeleportProjection()
 {
+	DestroyTrajectory();
+
 	if (projectionTimeline.IsValid())
 	{
 		projectionTimeline->Stop();

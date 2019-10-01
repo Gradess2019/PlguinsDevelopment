@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Teleport();
 
+	UFUNCTION(BlueprintCallable)
+	void StopTeleportProjection();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
@@ -140,8 +143,7 @@ private:
 	UFUNCTION()
 	void GetPathPositions(TArray<FVector>& targetArray);
 
-	UFUNCTION()
-	void StopTeleportProjection();
+	
 
 	UFUNCTION()
 	void SetOwnerLocation();

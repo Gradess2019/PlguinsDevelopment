@@ -6,6 +6,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/TimelineComponent.h"
 #include "VRPackStructs.h"
+#include "Picture.h"
 #include "PaintComponent.generated.h"
 
 
@@ -20,19 +21,36 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void StartDrawing();
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void StopDrawing();
 
-private:
+	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	void FinishDrawing();
 
-	UStaticMesh* SplineMesh;
+private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	FTimelineSettings TimelineSettings;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
+	FVector BrushOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
+	float SliceSize;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
+	UStaticMesh* SplineMesh;
+
+	TWeakObjectPtr<USceneComponent> BrushSceneComponent;
 	
 	TWeakObjectPtr<UTimelineComponent> DrawingTimeline;
 
+	TWeakObjectPtr<APicture> CurrentPicture;
+
 	void InitializeComponent() override;
 	void InitializeDrawingTimeline();
+
+	UFUNCTION()
+	void OnUpdatePaint();
 };
