@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "VRPackStructs.generated.h"
 
 USTRUCT(BlueprintType)
@@ -35,5 +36,37 @@ struct FFadeSettings
 
 		bShouldFadeAudio = false;
 		bHoldWhenFinished = true;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FTimelineSettings
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+	bool Loop;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+	bool IgnoreTimeDilation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+	float Length;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+	float PlayRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+	TEnumAsByte<ETimelineLengthMode> Mode;
+
+	FTimelineSettings()
+	{
+		Loop = false;
+		IgnoreTimeDilation = false;
+
+		Length = 5.f;
+		PlayRate = 1.f;
+
+		Mode = ETimelineLengthMode::TL_TimelineLength;
 	}
 };
