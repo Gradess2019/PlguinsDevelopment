@@ -10,6 +10,7 @@ UPaintComponent::UPaintComponent(const FObjectInitializer& ObjectInitializer)
 	bWantsInitializeComponent = true;
 	TimelineSettings.Loop = true;
 	SliceSize = 10.f;
+	AllowableAngle = 40.f;
 }
 
 void UPaintComponent::InitializeComponent()
@@ -17,11 +18,6 @@ void UPaintComponent::InitializeComponent()
 	Super::InitializeComponent();
 	
 	InitializeDrawingTimeline();
-
-	BrushSceneComponent = NewObject<USceneComponent>(this);
-	BrushSceneComponent->RegisterComponent();
-	BrushSceneComponent->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	BrushSceneComponent->SetRelativeLocation(BrushSceneComponent->RelativeLocation + BrushOffset);
 }
 
 void UPaintComponent::InitializeDrawingTimeline()
@@ -60,8 +56,8 @@ void UPaintComponent::StartDrawing()
 		Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		Parameters.Owner = GetOwner();
 		CurrentPicture = GetWorld()->SpawnActor<APicture>(Parameters);
-		CurrentPicture->SetActorTransform(FTransform());
-		CurrentPicture->InitializePicture(SliceSize, SplineMesh);
+		CurrentPicture->SetActorLocation(GetComponentLocation());
+		CurrentPicture->InitializePicture(SliceSize, AllowableAngle, SplineMesh);
 	}
 
 	CurrentPicture->CreateNewMesh(this->GetComponentLocation());

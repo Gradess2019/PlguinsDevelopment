@@ -17,7 +17,7 @@ public:
 	APicture(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
-	void InitializePicture(float PictureSliceSize, UStaticMesh* PictureMesh);
+	void InitializePicture(float PictureSliceSize, float MaxAngle, UStaticMesh* PictureMesh);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void Follow(FVector PointLocation);
@@ -28,6 +28,7 @@ public:
 private:
 	
 	float SliceSize;
+	float MaxAngle;
 
 	FVector LastDrewLocation;
 
@@ -35,7 +36,7 @@ private:
 	
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
-	
-	void DrawNext(FVector PointLocation);
 
+	bool IsAllowableAngle();
+	void DrawNext(FVector PointLocation);
 };

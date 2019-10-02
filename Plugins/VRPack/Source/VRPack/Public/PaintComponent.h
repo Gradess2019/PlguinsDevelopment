@@ -34,16 +34,14 @@ private:
 	FTimelineSettings TimelineSettings;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	FVector BrushOffset;
+	float SliceSize;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	float SliceSize;
+	float AllowableAngle;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	UStaticMesh* SplineMesh;
 
-	TWeakObjectPtr<USceneComponent> BrushSceneComponent;
-	
 	TWeakObjectPtr<UTimelineComponent> DrawingTimeline;
 
 	TWeakObjectPtr<APicture> CurrentPicture;
