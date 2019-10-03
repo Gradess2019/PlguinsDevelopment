@@ -70,3 +70,23 @@ struct FTimelineSettings
 		Mode = ETimelineLengthMode::TL_TimelineLength;
 	}
 };
+
+USTRUCT(BlueprintType)
+struct FPictureSettings
+{
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	float SliceSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	float AllowableAngle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	float SliceAngleTolerance;
+
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
+	UStaticMesh* StaticMesh;
+
+	
+};
