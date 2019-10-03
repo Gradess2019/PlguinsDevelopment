@@ -18,6 +18,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void InitializePicture(float PictureSliceSize, float MaxAngle, UStaticMesh* PictureMesh);
+	bool IsAllowableSize() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void Follow(FVector PointLocation);
@@ -37,6 +38,7 @@ private:
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
 
-	bool IsAllowableAngle();
-	void DrawNext(FVector PointLocation);
+	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
+	void CreateSplineMeshComponent(FVector RelativeLocation);
+	bool IsAllowableAngle() const;
 };
