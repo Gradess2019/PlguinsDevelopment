@@ -74,6 +74,8 @@ struct FTimelineSettings
 USTRUCT(BlueprintType)
 struct FPictureSettings
 {
+	GENERATED_BODY()
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
 	float SliceSize;
 
@@ -82,11 +84,16 @@ struct FPictureSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
 	float SliceAngleTolerance;
-
-
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	UStaticMesh* StaticMesh;
 
-	
+	FPictureSettings()
+	{
+		SliceSize = 10.f;
+		AllowableAngle = 40.f;
+		SliceAngleTolerance = 1.f;
+
+		StaticMesh = nullptr;
+	}
 };

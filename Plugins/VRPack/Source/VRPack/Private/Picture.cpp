@@ -9,11 +9,9 @@ APicture::APicture(const FObjectInitializer& ObjectInitializer)
 	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "RootSceneComponent");
 }
 
-void APicture::InitializePicture(float PictureSliceSize, float MaxAngle, UStaticMesh* PictureMesh)
+void APicture::InitializePicture(FPictureSettings PictureSettings)
 {
-	this->SliceSize = PictureSliceSize;
-	this->Mesh = PictureMesh;
-	this->MaxAngle = MaxAngle;
+	this->PictureSettings = PictureSettings;
 }
 
 void APicture::Follow(FVector PointLocation)
@@ -28,7 +26,7 @@ void APicture::Follow(FVector PointLocation)
 
 bool APicture::IsAllowableSize() const
 {
-	return (CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition()).Size() < SliceSize;
+	return (CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition()).Size() < PictureSettings.SliceSize;
 }
 
 bool APicture::IsAllowableAngle() const
@@ -39,7 +37,7 @@ bool APicture::IsAllowableAngle() const
 	const FVector LastSplineDirection = UKismetMathLibrary::Normal(LastDrawnSlice->GetEndPosition() - LastDrawnSlice->GetStartPosition());
 	const FVector CurrentSplineDirection = UKismetMathLibrary::Normal(CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition());
 	const float Angle = UKismetMathLibrary::DegAcos(UKismetMathLibrary::Dot_VectorVector(CurrentSplineDirection, LastSplineDirection));
-	return MaxAngle > Angle;
+	return PictureSettings.AllowableAngle > Angle;
 }
 
 void APicture::CalculateSplineTangentAndPositions(FVector PointLocation) const
@@ -71,7 +69,7 @@ void APicture::CreateNewMesh(FVector PointLocation)
 		CurrentSlice->SetStartAndEnd(FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector);
 	}
 	
-	CurrentSlice->SetStaticMesh(Mesh);
+	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 }
 
 void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
@@ -82,3 +80,10 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 	CurrentSlice->SetRelativeLocation(RelativeLocation);
 }
+
+void APicture::FinishFollowing()
+{
+	LastDrawnSlice = nullptr;
+	CurrentSlice = nullptr;
+}
+

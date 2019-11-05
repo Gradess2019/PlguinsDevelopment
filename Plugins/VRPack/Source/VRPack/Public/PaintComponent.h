@@ -34,14 +34,8 @@ private:
 	FTimelineSettings TimelineSettings;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	float SliceSize;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	float AllowableAngle;
+	FPictureSettings PictureSettings;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	UStaticMesh* SplineMesh;
-
 	TWeakObjectPtr<UTimelineComponent> DrawingTimeline;
 
 	TWeakObjectPtr<APicture> CurrentPicture;

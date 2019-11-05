@@ -2,24 +2,25 @@
 
 #include "PickuperComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UPickuperComponent::UPickuperComponent()
 {
-	SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	UPrimitiveComponent::SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	BoxExtent = FVector(10.f);
-	OnComponentBeginOverlap.AddDynamic(this, &UPickuperComponent::OnBeginOverlapPickupableObject);
-	OnComponentEndOverlap.AddDynamic(this, &UPickuperComponent::OnEndOverlapPickupableObject);
 }
 
 void UPickuperComponent::Pickup()
 {
-	if (!OverlappedObject.IsValid()) return;
+	if (OverlappingComponents.Num() == 0) { return; }
 
-	OverlappedObject->SetSimulatePhysics(false);
-	OverlappedObject->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+	OverlappedObject = OverlappingComponents[0].OverlapInfo.Component;
+
 	PickupedObject = OverlappedObject;
-	OverlappedObject->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	OverlappedObject->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
+	PickupedObject->SetSimulatePhysics(false);
+	PickupedObject->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	PickupedObject->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
+	PickupedObject->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void UPickuperComponent::Throw()
@@ -33,18 +34,3 @@ void UPickuperComponent::Throw()
 	PickupedObject = nullptr;
 }
 
-void UPickuperComponent::OnBeginOverlapPickupableObject(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OverlappedObject.IsValid()) return;
-
-	OverlappedObject = OtherComp;
-}
-
-void UPickuperComponent::OnEndOverlapPickupableObject(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OverlappedObject != OtherComp) return;
-
-	OverlappedObject = nullptr;
-}

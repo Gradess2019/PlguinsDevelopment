@@ -9,8 +9,6 @@ UPaintComponent::UPaintComponent(const FObjectInitializer& ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 	TimelineSettings.Loop = true;
-	SliceSize = 10.f;
-	AllowableAngle = 40.f;
 }
 
 void UPaintComponent::InitializeComponent()
@@ -57,7 +55,7 @@ void UPaintComponent::StartDrawing()
 		Parameters.Owner = GetOwner();
 		CurrentPicture = GetWorld()->SpawnActor<APicture>(Parameters);
 		CurrentPicture->SetActorLocation(GetComponentLocation());
-		CurrentPicture->InitializePicture(SliceSize, AllowableAngle, SplineMesh);
+		CurrentPicture->InitializePicture(PictureSettings);
 	}
 
 	CurrentPicture->CreateNewMesh(this->GetComponentLocation());
@@ -77,6 +75,7 @@ void UPaintComponent::StopDrawing()
 #endif
 
 	DrawingTimeline->Stop();
+	CurrentPicture->FinishFollowing();
 }
 
 void UPaintComponent::FinishDrawing()
