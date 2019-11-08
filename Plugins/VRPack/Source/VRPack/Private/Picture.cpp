@@ -52,6 +52,7 @@ float APicture::GetAngle() const
 	return UKismetMathLibrary::DegAcos(DotProduct);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 FVector APicture::GetNormalizedDirection(const USplineMeshComponent* SplineMesh) const
 {
 	return UKismetMathLibrary::Normal(SplineMesh->GetEndPosition() - SplineMesh->GetStartPosition());
@@ -120,6 +121,8 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 	CurrentSlice->SetRelativeLocation(RelativeLocation);
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
+	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
+	CurrentSlice->SetCollisionProfileName(PictureSettings.CollisionPreset);
 }
 
 void APicture::SetStartAndEnd(const FSplineMeshInitializer& Initializer) const

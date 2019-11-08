@@ -84,7 +84,13 @@ struct FPictureSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
 	float SliceAngleTolerance;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	bool CastShadow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FName CollisionPreset;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	UStaticMesh* StaticMesh;
 
@@ -92,8 +98,12 @@ struct FPictureSettings
 	{
 		SliceSize = 10.f;
 		AllowableAngle = 40.f;
-		SliceAngleTolerance = 1.f;
+		SliceAngleTolerance = 0.1f;
 
+		CastShadow = false;
+
+		CollisionPreset = FName("BlockAll");
+		
 		StaticMesh = nullptr;
 	}
 };
