@@ -3,6 +3,7 @@
 #include "PickuperComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/Actor.h"
 
 UPickuperComponent::UPickuperComponent()
 {
@@ -12,25 +13,27 @@ UPickuperComponent::UPickuperComponent()
 
 void UPickuperComponent::Pickup()
 {
-	if (OverlappingComponents.Num() == 0) { return; }
+	TArray<AActor*> OverlappingActors;
+	this->GetOverlappingActors(OverlappingActors);
+	
+	if (OverlappingActors.Num() == 0) { return; }
 
-	OverlappedObject = OverlappingComponents[0].OverlapInfo.Component;
+	PickupedActor = OverlappingActors[0];
+	PickupedActor->SetSimulatePhysics(false);
+	PickupedActor->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	PickupedActor->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
+	PickupedActor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 
-	PickupedObject = OverlappedObject;
-	PickupedObject->SetSimulatePhysics(false);
-	PickupedObject->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	PickupedObject->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
-	PickupedObject->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void UPickuperComponent::Throw()
 {
-	if (!PickupedObject.IsValid()) return;
+	if (!PickupedActor.IsValid()) return;
 
-	PickupedObject->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	PickupedObject->SetSimulatePhysics(true);
-	PickupedObject->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
-	PickupedObject->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Block);
-	PickupedObject = nullptr;
+	PickupedActor->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	PickupedActor->SetSimulatePhysics(true);
+	PickupedActor->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+	PickupedActor->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Block);
+	PickupedActor = nullptr;
 }
 

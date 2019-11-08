@@ -25,7 +25,6 @@ public:
 
 private:
 
-	TWeakObjectPtr<UPrimitiveComponent> PickupedObject;
-	TWeakObjectPtr<UPrimitiveComponent> OverlappedObject;
+	TWeakObjectPtr<AActor*> PickupedActor;
 	
 };

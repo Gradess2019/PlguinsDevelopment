@@ -134,3 +134,11 @@ struct FSplineMeshInitializer
 
 };
 
+USTRUCT(BlueprintType)
+struct FStaticMeshData
+{
+	GENERATED_BODY()
+
+	
+};
+
