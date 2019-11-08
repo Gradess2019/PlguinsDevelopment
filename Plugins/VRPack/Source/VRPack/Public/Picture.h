@@ -39,6 +39,7 @@ private:
 	bool IsAllowableSize() const;
 	bool IsAllowableAngle() const;
 	float GetAngle() const;
+	FVector GetNormalizedDirection(const USplineMeshComponent* SplineMesh) const;
 	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
 
 	FTransform GetParentTransform() const;
