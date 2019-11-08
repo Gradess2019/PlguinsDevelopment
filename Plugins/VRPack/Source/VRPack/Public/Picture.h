@@ -12,7 +12,7 @@ UCLASS()
 class VRPACK_API APicture : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	APicture(const FObjectInitializer& ObjectInitializer);
@@ -21,24 +21,29 @@ public:
 	void InitializePicture(FPictureSettings PictureSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
-	void Follow(FVector PointLocation);
-
-	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void FinishFollowing();
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
+	void Follow(FVector PointLocation);
+
+	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void CreateNewMesh(FVector PointLocation);
-	
+
 private:
-	
+
 	FPictureSettings PictureSettings;
-	
+
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
 
-	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
-	void CreateSplineMeshComponent(FVector RelativeLocation);
-
 	bool IsAllowableSize() const;
 	bool IsAllowableAngle() const;
+	float GetAngle() const;
+	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
+
+	FTransform GetParentTransform() const;
+	void SetStartAndEnd(const FSplineMeshInitializer& Initializer) const;
+	void CreateSplineMeshComponent(FVector RelativeLocation);
+
+	
 };

@@ -14,6 +14,12 @@ void APicture::InitializePicture(FPictureSettings PictureSettings)
 	this->PictureSettings = PictureSettings;
 }
 
+void APicture::FinishFollowing()
+{
+	LastDrawnSlice = nullptr;
+	CurrentSlice = nullptr;
+}
+
 void APicture::Follow(FVector PointLocation)
 {
 	if (!IsAllowableSize() || !IsAllowableAngle())
@@ -32,17 +38,26 @@ bool APicture::IsAllowableSize() const
 bool APicture::IsAllowableAngle() const
 {
 	if (!LastDrawnSlice.IsValid()) return false;
-	if (CurrentSlice->GetEndPosition().Equals(FVector::ZeroVector, 1.f)) return true;
+	if (CurrentSlice->GetEndPosition().Equals(FVector::ZeroVector, 0.1f)) return true;
 
-	const FVector LastSplineDirection = UKismetMathLibrary::Normal(LastDrawnSlice->GetEndPosition() - LastDrawnSlice->GetStartPosition());
-	const FVector CurrentSplineDirection = UKismetMathLibrary::Normal(CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition());
-	const float Angle = UKismetMathLibrary::DegAcos(UKismetMathLibrary::Dot_VectorVector(CurrentSplineDirection, LastSplineDirection));
-	return PictureSettings.AllowableAngle > Angle;
+	return PictureSettings.AllowableAngle > GetAngle();
+}
+
+float APicture::GetAngle() const
+{
+	const FVector LastSplineDirection = UKismetMathLibrary::Normal(
+		LastDrawnSlice->GetEndPosition() - LastDrawnSlice->GetStartPosition());
+	const FVector CurrentSplineDirection = UKismetMathLibrary::Normal(
+		CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition());
+
+	const float DotProduct = UKismetMathLibrary::Dot_VectorVector(CurrentSplineDirection, LastSplineDirection);
+	return UKismetMathLibrary::DegAcos(DotProduct);
 }
 
 void APicture::CalculateSplineTangentAndPositions(FVector PointLocation) const
 {
-	const FVector EndPosition = UKismetMathLibrary::InverseTransformLocation(CurrentSlice->GetComponentTransform(), PointLocation);
+	const FVector EndPosition = UKismetMathLibrary::InverseTransformLocation(
+		CurrentSlice->GetComponentTransform(), PointLocation);
 	const FVector EndTangent = CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition();
 
 	if (!LastDrawnSlice.IsValid())
@@ -56,20 +71,34 @@ void APicture::CalculateSplineTangentAndPositions(FVector PointLocation) const
 
 void APicture::CreateNewMesh(FVector PointLocation)
 {
+	const FTransform ParentTransform = GetParentTransform();
+	const FVector LocalPointPostition = UKismetMathLibrary::InverseTransformLocation(ParentTransform, PointLocation);
+
+	FSplineMeshInitializer Initializer;
+	FVector RelativeLocation;
+
 	if (CurrentSlice.IsValid())
 	{
-		const FVector LocalPointPostition = UKismetMathLibrary::InverseTransformLocation(CurrentSlice->GetComponentTransform(), PointLocation);
+		RelativeLocation = CurrentSlice->GetEndPosition() + CurrentSlice->RelativeLocation;
+		Initializer = FSplineMeshInitializer(FVector::ZeroVector, CurrentSlice->GetEndTangent(), LocalPointPostition,
+		                                     LocalPointPostition);
 		LastDrawnSlice = CurrentSlice;
-		CreateSplineMeshComponent(LastDrawnSlice->GetEndPosition() + LastDrawnSlice->RelativeLocation);
-		CurrentSlice->SetStartAndEnd(FVector::ZeroVector, LastDrawnSlice->GetEndTangent(), LocalPointPostition, LocalPointPostition);
-	} else
-	{
-		const FVector LocalPointPostition = UKismetMathLibrary::InverseTransformLocation(GetActorTransform(), PointLocation);
-		CreateSplineMeshComponent(LocalPointPostition);
-		CurrentSlice->SetStartAndEnd(FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector);
 	}
-	
-	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
+	else
+	{
+		RelativeLocation = LocalPointPostition;
+	}
+
+	CreateSplineMeshComponent(RelativeLocation);
+	SetStartAndEnd(Initializer);
+	UE_LOG(LogTemp, Warning, TEXT("New mesh was created"));
+}
+
+FTransform APicture::GetParentTransform() const
+{
+	return CurrentSlice.IsValid()
+		       ? CurrentSlice->GetComponentTransform()
+		       : GetActorTransform();
 }
 
 void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
@@ -79,11 +108,11 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->RegisterComponent();
 	CurrentSlice->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 	CurrentSlice->SetRelativeLocation(RelativeLocation);
+	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 }
 
-void APicture::FinishFollowing()
+void APicture::SetStartAndEnd(const FSplineMeshInitializer& Initializer) const
 {
-	LastDrawnSlice = nullptr;
-	CurrentSlice = nullptr;
+	CurrentSlice->SetStartAndEnd(Initializer.StartPos, Initializer.StartTangent, Initializer.EndPos,
+	                             Initializer.EndTangent);
 }
-
