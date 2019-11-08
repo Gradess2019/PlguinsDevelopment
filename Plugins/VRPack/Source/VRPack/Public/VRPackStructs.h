@@ -97,3 +97,30 @@ struct FPictureSettings
 		StaticMesh = nullptr;
 	}
 };
+
+struct FSplineMeshInitializer;
+
+USTRUCT(BlueprintType)
+struct FSplineMeshInitializer
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FVector StartPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FVector StartTangent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FVector EndPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FVector EndTangent;
+
+	FSplineMeshInitializer(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent) :
+		StartPos(StartPos), StartTangent(StartTangent), EndPos(EndPos), EndTangent(EndTangent) {}
+
+	FSplineMeshInitializer() : StartPos(FVector::ZeroVector), StartTangent(FVector::ZeroVector), EndPos(FVector::ZeroVector), EndTangent(FVector::ZeroVector) {}
+
+};
+
