@@ -166,7 +166,7 @@ struct FStaticMeshData
 		ResponseData = Component->GetCollisionResponseToChannels();
 	}
 
-	void LoadData() const
+	void ApplySavedData() const
 	{
 		Component->SetSimulatePhysics(SimulatePhysics);
 		Component->SetCollisionProfileName(CollisionProfileName);
