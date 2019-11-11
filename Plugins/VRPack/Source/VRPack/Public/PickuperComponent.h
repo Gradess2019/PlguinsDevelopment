@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "VRPackStructs.h"
 #include "PickuperComponent.generated.h"
 
 
@@ -25,6 +26,6 @@ public:
 
 private:
 
-	TWeakObjectPtr<AActor*> PickupedActor;
-	
+	TWeakObjectPtr<AActor> PickupedActor;
+	TArray<FStaticMeshData> StaticMeshDatas;
 };

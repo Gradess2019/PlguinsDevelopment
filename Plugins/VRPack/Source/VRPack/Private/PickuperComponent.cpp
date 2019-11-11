@@ -9,31 +9,44 @@ UPickuperComponent::UPickuperComponent()
 {
 	UPrimitiveComponent::SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	BoxExtent = FVector(10.f);
+	StaticMeshDatas = TArray<FStaticMeshData>();
 }
 
 void UPickuperComponent::Pickup()
 {
 	TArray<AActor*> OverlappingActors;
 	this->GetOverlappingActors(OverlappingActors);
-	
+
 	if (OverlappingActors.Num() == 0) { return; }
 
 	PickupedActor = OverlappingActors[0];
-	PickupedActor->SetSimulatePhysics(false);
-	PickupedActor->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	PickupedActor->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
-	PickupedActor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+	TArray<UStaticMeshComponent*> Components;
+	PickupedActor->GetComponents<UStaticMeshComponent>(Components);
 
+	for (UStaticMeshComponent* Component : Components)
+	{
+		FStaticMeshData Data(Component);
+
+		StaticMeshDatas.Add(Data);
+
+		Component->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		Component->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
+	}
+	
+	PickupedActor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void UPickuperComponent::Throw()
 {
 	if (!PickupedActor.IsValid()) return;
 
-	PickupedActor->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	PickupedActor->SetSimulatePhysics(true);
-	PickupedActor->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
-	PickupedActor->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Block);
+	for (FStaticMeshData& Data : StaticMeshDatas)
+	{
+		Data.ApplySavedData();
+	}
+	StaticMeshDatas.Empty();
+
+	PickupedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PickupedActor = nullptr;
 }
 

@@ -9,22 +9,22 @@ struct FFadeSettings
 	GENERATED_BODY();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	float FromAlpha;
+		float FromAlpha;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	float ToAlpha;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	float Duration;
+		float ToAlpha;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	FLinearColor Color;
+		float Duration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	bool bShouldFadeAudio;
+		FLinearColor Color;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	bool bHoldWhenFinished;
+		bool bShouldFadeAudio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
+		bool bHoldWhenFinished;
 
 	FFadeSettings()
 	{
@@ -45,19 +45,19 @@ struct FTimelineSettings
 	GENERATED_BODY();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	bool Loop;
+		bool Loop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	bool IgnoreTimeDilation;
+		bool IgnoreTimeDilation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	float Length;
+		float Length;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	float PlayRate;
+		float PlayRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-	TEnumAsByte<ETimelineLengthMode> Mode;
+		TEnumAsByte<ETimelineLengthMode> Mode;
 
 	FTimelineSettings()
 	{
@@ -76,23 +76,23 @@ struct FPictureSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	float SliceSize;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+		float SliceSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	float AllowableAngle;
+		float AllowableAngle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	float SliceAngleTolerance;
+		float SliceAngleTolerance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	bool CastShadow;
+		bool CastShadow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	FName CollisionPreset;
+		FName CollisionPreset;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	UStaticMesh* StaticMesh;
+		UStaticMesh* StaticMesh;
 
 	FPictureSettings()
 	{
@@ -103,7 +103,7 @@ struct FPictureSettings
 		CastShadow = false;
 
 		CollisionPreset = FName("BlockAll");
-		
+
 		StaticMesh = nullptr;
 	}
 };
@@ -115,17 +115,17 @@ struct FSplineMeshInitializer
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	FVector StartPos;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+		FVector StartPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	FVector StartTangent;
+		FVector StartTangent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	FVector EndPos;
+		FVector EndPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-	FVector EndTangent;
+		FVector EndTangent;
 
 	FSplineMeshInitializer(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent) :
 		StartPos(StartPos), StartTangent(StartTangent), EndPos(EndPos), EndTangent(EndTangent) {}
@@ -139,6 +139,37 @@ struct FStaticMeshData
 {
 	GENERATED_BODY()
 
-	
-};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Mesh Data")
+	TWeakObjectPtr<UStaticMeshComponent> Component;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Mesh Data")
+	bool SimulatePhysics;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Mesh Data")
+	FName CollisionProfileName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Static Mesh Data")
+	FCollisionResponseContainer ResponseData;
+
+	FStaticMeshData() : SimulatePhysics(false), CollisionProfileName(NAME_None) {}
+
+	FStaticMeshData(UStaticMeshComponent* Component)
+	{
+		SaveData(Component);
+	}
+
+	void SaveData(UStaticMeshComponent* Component)
+	{
+		this->Component = Component;
+		SimulatePhysics = Component->IsSimulatingPhysics();
+		CollisionProfileName = Component->GetCollisionProfileName();
+		ResponseData = Component->GetCollisionResponseToChannels();
+	}
+
+	void LoadData() const
+	{
+		Component->SetSimulatePhysics(SimulatePhysics);
+		Component->SetCollisionProfileName(CollisionProfileName);
+		Component->SetCollisionResponseToChannels(ResponseData);
+	}
+};
