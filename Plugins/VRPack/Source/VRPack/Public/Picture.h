@@ -19,10 +19,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void InitializePicture(FPictureSettings PictureSettings);
-	void UpdateMaterial(FPictureSettings PictureSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void UpdatePictureSettings(FPictureSettings PictureSettings);
+	
+	UFUNCTION(BlueprintCallable, Category = "Picture")
+	void EnableCollision();
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void FinishFollowing();

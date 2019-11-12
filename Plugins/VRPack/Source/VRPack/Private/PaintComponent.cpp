@@ -75,12 +75,17 @@ void UPaintComponent::StopDrawing()
 #endif
 
 	DrawingTimeline->Stop();
+
+	if (!CurrentPicture.IsValid()) { return; }
 	CurrentPicture->FinishFollowing();
 }
 
 void UPaintComponent::FinishDrawing()
 {
 	DrawingTimeline->Stop();
+
+	if (!CurrentPicture.IsValid()) { return; }
+	CurrentPicture->EnableCollision();
 	CurrentPicture = nullptr;
 }
 

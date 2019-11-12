@@ -29,13 +29,12 @@ void APicture::EnableCollision()
 
 	for (UStaticMeshComponent* Component : Components)
 	{
-		Component->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Component->SetCollisionProfileName(PictureSettings.CollisionPreset);
 	}
 }
 
 void APicture::FinishFollowing()
 {
-	EnableCollision();
 	LastDrawnSlice = nullptr;
 	CurrentSlice = nullptr;
 }
@@ -142,8 +141,7 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->SetRelativeLocation(RelativeLocation);
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
-	CurrentSlice->SetCollisionProfileName(PictureSettings.CollisionPreset);
-	CurrentSlice->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CurrentSlice->SetCollisionProfileName("NoCollision");
 
 	const FVector2D Scale = FVector2D(PictureSettings.Width, PictureSettings.Width);
 	CurrentSlice->SetStartScale(Scale);
