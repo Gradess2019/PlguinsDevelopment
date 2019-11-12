@@ -28,6 +28,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void FinishDrawing();
 
+	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	void SetLineWidth(float NewWidth);
+	void UpdatePictureSettings() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	void SetLineColor(const FLinearColor& NewColor);
+	
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")

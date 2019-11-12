@@ -16,9 +16,12 @@ class VRPACK_API APicture : public AActor
 public:
 
 	APicture(const FObjectInitializer& ObjectInitializer);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void InitializePicture(FPictureSettings PictureSettings);
+	
+	UFUNCTION(BlueprintCallable, Category = "Picture")
+	void UpdatePictureSettings(FPictureSettings PictureSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void FinishFollowing();
@@ -36,6 +39,8 @@ private:
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
 
+	TWeakObjectPtr<UMaterialInstanceDynamic> Material;
+
 	bool IsAllowableSize() const;
 	bool IsAllowableAngle() const;
 	float GetAngle() const;
@@ -43,8 +48,8 @@ private:
 	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
 
 	FTransform GetParentTransform() const;
+	void SetMaterial();
+	void CreateMaterial();
 	void SetStartAndEnd(const FSplineMeshInitializer& Initializer) const;
 	void CreateSplineMeshComponent(FVector RelativeLocation);
-
-	
 };

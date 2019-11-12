@@ -1,6 +1,8 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Components/TimelineComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "VRPackStructs.generated.h"
 
 USTRUCT(BlueprintType)
@@ -9,22 +11,22 @@ struct FFadeSettings
 	GENERATED_BODY();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		float FromAlpha;
+	float FromAlpha;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		float ToAlpha;
+	float ToAlpha;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		float Duration;
+	float Duration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		FLinearColor Color;
+	FLinearColor Color;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		bool bShouldFadeAudio;
+	bool bShouldFadeAudio;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		bool bHoldWhenFinished;
+	bool bHoldWhenFinished;
 
 	FFadeSettings()
 	{
@@ -45,19 +47,19 @@ struct FTimelineSettings
 	GENERATED_BODY();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		bool Loop;
+	bool Loop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		bool IgnoreTimeDilation;
+	bool IgnoreTimeDilation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		float Length;
+	float Length;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		float PlayRate;
+	float PlayRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fade Settings")
-		TEnumAsByte<ETimelineLengthMode> Mode;
+	TEnumAsByte<ETimelineLengthMode> Mode;
 
 	FTimelineSettings()
 	{
@@ -76,35 +78,44 @@ struct FPictureSettings
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		float SliceSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	float SliceSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		float AllowableAngle;
+	float AllowableAngle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		float SliceAngleTolerance;
+	float SliceAngleTolerance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		bool CastShadow;
+	float Width;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	bool CastShadow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		FName CollisionPreset;
+	FName CollisionPreset;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-		UStaticMesh* StaticMesh;
+	UPROPERTY(EditDefaultsOnly, Category = "Picture settings")
+	UStaticMesh* StaticMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FLinearColor Color;
+	
 	FPictureSettings()
 	{
 		SliceSize = 10.f;
 		AllowableAngle = 40.f;
 		SliceAngleTolerance = 0.1f;
+		Width = 1.f;
 
 		CastShadow = false;
 
 		CollisionPreset = FName("BlockAll");
 
 		StaticMesh = nullptr;
+		
+		Color = FLinearColor::Blue;
 	}
 };
 
@@ -115,22 +126,23 @@ struct FSplineMeshInitializer
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		FVector StartPos;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
+	FVector StartPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		FVector StartTangent;
+	FVector StartTangent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		FVector EndPos;
+	FVector EndPos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
-		FVector EndTangent;
+	FVector EndTangent;
 
 	FSplineMeshInitializer(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent) :
-		StartPos(StartPos), StartTangent(StartTangent), EndPos(EndPos), EndTangent(EndTangent) {}
+	StartPos(StartPos), StartTangent(StartTangent), EndPos(EndPos), EndTangent(EndTangent) {}
 
-	FSplineMeshInitializer() : StartPos(FVector::ZeroVector), StartTangent(FVector::ZeroVector), EndPos(FVector::ZeroVector), EndTangent(FVector::ZeroVector) {}
+	FSplineMeshInitializer() :
+		StartPos(FVector::ZeroVector), StartTangent(FVector::ZeroVector), EndPos(FVector::ZeroVector), EndTangent(FVector::ZeroVector) {}
 
 };
 

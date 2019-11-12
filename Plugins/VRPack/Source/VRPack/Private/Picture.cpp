@@ -14,6 +14,12 @@ void APicture::InitializePicture(FPictureSettings PictureSettings)
 	this->PictureSettings = PictureSettings;
 }
 
+void APicture::UpdatePictureSettings(FPictureSettings PictureSettings)
+{
+	this->PictureSettings = PictureSettings;
+	CreateMaterial();
+}
+
 void APicture::FinishFollowing()
 {
 	LastDrawnSlice = nullptr;
@@ -123,6 +129,28 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
 	CurrentSlice->SetCollisionProfileName(PictureSettings.CollisionPreset);
+
+	const FVector2D Scale = FVector2D(PictureSettings.Width, PictureSettings.Width);
+	CurrentSlice->SetStartScale(Scale);
+	CurrentSlice->SetEndScale(Scale);
+
+	SetMaterial();
+}
+
+void APicture::SetMaterial()
+{
+	if (!Material.IsValid())
+	{
+		CreateMaterial();
+	}
+	CurrentSlice->SetMaterial(0, Material.Get());
+}
+
+void APicture::CreateMaterial()
+{
+	UMaterialInterface* SourceMaterial = CurrentSlice->GetMaterial(0);
+	Material = CurrentSlice->CreateDynamicMaterialInstance(0, SourceMaterial);
+	Material->SetVectorParameterValue("Color", PictureSettings.Color);
 }
 
 void APicture::SetStartAndEnd(const FSplineMeshInitializer& Initializer) const

@@ -83,3 +83,22 @@ void UPaintComponent::FinishDrawing()
 	DrawingTimeline->Stop();
 	CurrentPicture = nullptr;
 }
+
+void UPaintComponent::SetLineWidth(float NewWidth)
+{
+	PictureSettings.Width = NewWidth;
+	UpdatePictureSettings();
+}
+
+// TODO may Observer design pattern would be better?
+void UPaintComponent::UpdatePictureSettings() const
+{
+	if (!CurrentPicture.IsValid()) { return; }
+	CurrentPicture->UpdatePictureSettings(PictureSettings);
+}
+
+void UPaintComponent::SetLineColor(const FLinearColor& NewColor)
+{
+	PictureSettings.Color = NewColor;
+	UpdatePictureSettings();
+}
