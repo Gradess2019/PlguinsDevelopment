@@ -3,6 +3,8 @@
 #include "Picture.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Engine/StaticMesh.h"
 
 APicture::APicture(const FObjectInitializer& ObjectInitializer)
 {
@@ -20,8 +22,20 @@ void APicture::UpdatePictureSettings(FPictureSettings PictureSettings)
 	CreateMaterial();
 }
 
+void APicture::EnableCollision()
+{
+	TArray<UStaticMeshComponent*> Components;
+	GetComponents<UStaticMeshComponent>(Components);
+
+	for (UStaticMeshComponent* Component : Components)
+	{
+		Component->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}
+
 void APicture::FinishFollowing()
 {
+	EnableCollision();
 	LastDrawnSlice = nullptr;
 	CurrentSlice = nullptr;
 }
@@ -129,6 +143,7 @@ void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
 	CurrentSlice->SetCollisionProfileName(PictureSettings.CollisionPreset);
+	CurrentSlice->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	const FVector2D Scale = FVector2D(PictureSettings.Width, PictureSettings.Width);
 	CurrentSlice->SetStartScale(Scale);
@@ -148,8 +163,8 @@ void APicture::SetMaterial()
 
 void APicture::CreateMaterial()
 {
-	UMaterialInterface* SourceMaterial = CurrentSlice->GetMaterial(0);
-	Material = CurrentSlice->CreateDynamicMaterialInstance(0, SourceMaterial);
+	UMaterialInterface* SourceMaterial = PictureSettings.StaticMesh->GetMaterial(0);
+	Material = UKismetMaterialLibrary::CreateDynamicMaterialInstance(this, SourceMaterial);
 	Material->SetVectorParameterValue("Color", PictureSettings.Color);
 }
 
