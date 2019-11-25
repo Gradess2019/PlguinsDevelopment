@@ -175,3 +175,8 @@ void APicture::SetStartAndEnd(const FSplineMeshInitializer& Initializer) const
 		Initializer.EndTangent
 	);
 }
+
+void APicture::SetVisible(bool bVisible)
+{
+	this->SetActorHiddenInGame(!bVisible);
+}

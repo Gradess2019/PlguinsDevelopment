@@ -120,16 +120,6 @@ void UTeleportComponent::BeginPlay()
 	projectionTimeline->RegisterComponent();
 	InitializeTimeline();
 
-	if (useFade)
-	{ 
-		FadeComponent = Cast<UFadeComponent>(owner->GetComponentByClass(UFadeComponent::StaticClass()));
-
-#if !UE_BUILD_SHIPPING
-		if (!FadeComponent.IsValid()) checkNoEntry();
-#endif
-		FadeComponent->OnFadeInFinishedDelegate.AddDynamic(this, &UTeleportComponent::SetOwnerLocation);
-	}
-
 	if (autoEnable)
 	{
 		StartTeleportProjection();
@@ -294,20 +284,13 @@ void UTeleportComponent::StartTeleportProjection()
 {
 	if (projectionTimeline.IsValid())
 	{
-		if (IsFadeFinished())
-		{
-			projectionTimeline->PlayFromStart();
-			ShowComponent(teleportLocationComponent.Get());
-		}
+		projectionTimeline->PlayFromStart();
+		ShowComponent(teleportLocationComponent.Get());
+		OnStartProjection.Broadcast();
 	} else
 	{
 		checkNoEntry();
 	}
-}
-
-bool UTeleportComponent::IsFadeFinished()
-{
-	return !useFade || useFade && FadeComponent.IsValid() && !FadeComponent->IsPlaying();
 }
 
 void UTeleportComponent::Teleport()
@@ -315,16 +298,13 @@ void UTeleportComponent::Teleport()
 	StopTeleportProjection();
 	if (lastHitResult.bBlockingHit && IsSuitableObjectType())
 	{
-		if (useFade)
-		{
-			FadeComponent->StartFade();
-		}
-		else
+		if (!useFade)
 		{
 			SetOwnerLocation();
 		}
 		
 		lastHitResult.bBlockingHit = false;
+		OnTeleportation.Broadcast();
 	}
 }
 
@@ -336,6 +316,7 @@ void UTeleportComponent::StopTeleportProjection()
 	{
 		projectionTimeline->Stop();
 		HideComponent(teleportLocationComponent.Get());
+		OnStopProjection.Broadcast();
 	}
 	else
 	{

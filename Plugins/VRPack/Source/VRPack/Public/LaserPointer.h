@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class VRPACK_API ULaserPointer : public USplineMeshComponent
 {
 	GENERATED_BODY()

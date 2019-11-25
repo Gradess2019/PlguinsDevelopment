@@ -35,6 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void CreateNewMesh(FVector PointLocation);
 
+	UFUNCTION(BlueprintCallable, Category = "Picture")
+	void SetVisible(bool bVisible);
+
 private:
 
 	FPictureSettings PictureSettings;

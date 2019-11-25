@@ -3,6 +3,7 @@
 #include "PickuperComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "PickupableObject.h"
 #include "GameFramework/Actor.h"
 
 UPickuperComponent::UPickuperComponent()
@@ -20,33 +21,19 @@ void UPickuperComponent::Pickup()
 	if (OverlappingActors.Num() == 0) { return; }
 
 	PickupedActor = OverlappingActors[0];
-	TArray<UStaticMeshComponent*> Components;
-	PickupedActor->GetComponents<UStaticMeshComponent>(Components);
-
-	for (UStaticMeshComponent* Component : Components)
+	if (PickupedActor->Implements<UPickupableObject>())
 	{
-		FStaticMeshData Data(Component);
-
-		StaticMeshDatas.Add(Data);
-
-		Component->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-		Component->SetCollisionResponseToChannel(GetCollisionObjectType(), ECollisionResponse::ECR_Ignore);
+		IPickupableObject::Execute_OnAttach(PickupedActor.Get(), this);
+	} else
+	{
+		PickupedActor = nullptr;
 	}
-	
-	PickupedActor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 void UPickuperComponent::Throw()
 {
 	if (!PickupedActor.IsValid()) return;
-
-	for (FStaticMeshData& Data : StaticMeshDatas)
-	{
-		Data.ApplySavedData();
-	}
-	StaticMeshDatas.Empty();
-
-	PickupedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	IPickupableObject::Execute_OnDetach(PickupedActor.Get());
 	PickupedActor = nullptr;
 }
 

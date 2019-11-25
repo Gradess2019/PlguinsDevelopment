@@ -1,2 +1,0 @@
-E:\UE4\UE_4.21\Engine\Build\BatchFiles\RunUAT.bat BuildPlugin -plugin="E:\UE4\Projects\PluginsDevelopment\Plugins\VRPack\VRPack.uplugin" -targetPlatforms=Win32+Win64 -package="Y:\2019\UE4\Plugins\VRPack" -rocket
-pause

@@ -8,10 +8,12 @@
 #include "Components/SplineMeshComponent.h"
 #include "Kismet/GameplayStaticsTypes.h"
 #include "Components/SplineComponent.h"
-#include "FadeComponent.h"
 #include "TimerManager.h"
 #include "TeleportComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTeleportation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartProjection);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopProjection);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRPACK_API UTeleportComponent : public UMotionControllerComponent
@@ -31,36 +33,51 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StopTeleportProjection();
 
+	/*
+	 * Used for binding to delegates
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetOwnerLocation();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintAssignable, Category = "Teleport settings")
+	FOnTeleportation OnTeleportation;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintAssignable, Category = "Teleport settings")
+	FOnStartProjection OnStartProjection;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintAssignable, Category = "Teleport settings")
+	FOnStopProjection OnStopProjection;
+
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	UStaticMesh* teleportLocationMesh;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	UStaticMesh* trajectoryMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	bool autoEnable;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	bool useFade;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	bool useOnlyNavigation;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	bool useNavigation;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings", meta = (EditCondition = "useOnlyNavigation"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings", meta = (EditCondition = "useOnlyNavigation"))
 	FVector queryExtent;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	FPredictProjectilePathParams projectilePathParams;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	float projectileVelocity;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Component settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teleport settings")
 	TEnumAsByte<EObjectTypeQuery> objectTypeForTeleport;
 
 	void BeginPlay() override;
@@ -86,9 +103,6 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<UStaticMeshComponent> teleportLocationComponent;
-
-	UPROPERTY()
-	TWeakObjectPtr<UFadeComponent> FadeComponent;
 
 	int uniqueId;
 
@@ -143,13 +157,6 @@ private:
 	UFUNCTION()
 	void GetPathPositions(TArray<FVector>& targetArray);
 
-	
-
-	UFUNCTION()
-	void SetOwnerLocation();
-
 	FVector CalculateLocation();
-
-	bool IsFadeFinished();
 };
 
