@@ -9,7 +9,7 @@
 #include "PickuperComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class VRPACK_API UPickuperComponent : public UBoxComponent
 {
 	GENERATED_BODY()

@@ -180,3 +180,13 @@ void APicture::SetVisible(bool bVisible)
 {
 	this->SetActorHiddenInGame(!bVisible);
 }
+
+void APicture::OnAttach_Implementation(USceneComponent* Parent)
+{
+	AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+}
+
+void APicture::OnDetach_Implementation()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}

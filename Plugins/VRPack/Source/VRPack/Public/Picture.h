@@ -6,10 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "Components/SplineMeshComponent.h"
 #include "VRPackStructs.h"
+#include "PickupableObject.h"
 #include "Picture.generated.h"
 
 UCLASS()
-class VRPACK_API APicture : public AActor
+class VRPACK_API APicture : public AActor, public IPickupableObject
 {
 	GENERATED_BODY()
 
@@ -38,6 +39,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void SetVisible(bool bVisible);
 
+	void OnAttach_Implementation(USceneComponent* Parent) override;
+	void OnDetach_Implementation() override;
+	
 private:
 
 	FPictureSettings PictureSettings;

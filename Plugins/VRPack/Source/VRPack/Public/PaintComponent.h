@@ -10,7 +10,7 @@
 #include "PaintComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class VRPACK_API UPaintComponent : public USceneComponent
 {
 	GENERATED_BODY()
