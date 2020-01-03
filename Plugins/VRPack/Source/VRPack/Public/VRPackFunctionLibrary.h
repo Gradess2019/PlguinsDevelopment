@@ -24,5 +24,8 @@ public:
 			TargetArray.Add(Object);
 		}
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "VRPackFunctionLibrary")
+	static FRotator ClampRotator(FRotator Rotator);
 	
 };
