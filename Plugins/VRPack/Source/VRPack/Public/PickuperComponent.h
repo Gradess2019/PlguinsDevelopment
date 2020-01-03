@@ -26,6 +26,6 @@ public:
 
 private:
 
-	TWeakObjectPtr<AActor> PickupedActor;
+	TWeakObjectPtr<UObject> PickupedObject;
 	TArray<FStaticMeshData> StaticMeshDatas;
 };

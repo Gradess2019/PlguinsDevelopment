@@ -4,6 +4,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PickupableObject.h"
+#include "VRPackFunctionLibrary.h"
 #include "GameFramework/Actor.h"
 
 UPickuperComponent::UPickuperComponent()
@@ -16,24 +17,29 @@ UPickuperComponent::UPickuperComponent()
 void UPickuperComponent::Pickup()
 {
 	TArray<AActor*> OverlappingActors;
+	TArray<UPrimitiveComponent*> OverlappingComponents;
+
 	this->GetOverlappingActors(OverlappingActors);
+	this->GetOverlappingComponents(OverlappingComponents);
 
-	if (OverlappingActors.Num() == 0) { return; }
+	if (OverlappingActors.Num() == 0 && OverlappingComponents.Num() == 0) { return; }
 
-	PickupedActor = OverlappingActors[0];
-	if (PickupedActor->Implements<UPickupableObject>())
+	TArray<UObject*> OverlappingObjects;
+
+	UVRPackFunctionLibrary::AppendArray<UObject, UPrimitiveComponent>(OverlappingObjects, OverlappingComponents);
+	UVRPackFunctionLibrary::AppendArray<UObject, AActor>(OverlappingObjects, OverlappingActors);
+
+	if (OverlappingObjects[0]->Implements<UPickupableObject>())
 	{
-		IPickupableObject::Execute_OnAttach(PickupedActor.Get(), this);
-	} else
-	{
-		PickupedActor = nullptr;
+		PickupedObject = OverlappingObjects[0];
+		IPickupableObject::Execute_OnAttach(PickupedObject.Get(), this);
 	}
 }
 
 void UPickuperComponent::Throw()
 {
-	if (!PickupedActor.IsValid()) return;
-	IPickupableObject::Execute_OnDetach(PickupedActor.Get());
-	PickupedActor = nullptr;
+	if (!PickupedObject.IsValid()) return;
+	IPickupableObject::Execute_OnDetach(PickupedObject.Get());
+	PickupedObject = nullptr;
 }
 
