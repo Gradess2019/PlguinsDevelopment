@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineMeshComponent.h"
+#include "Components/SplineComponent.h"
 #include "VRPackStructs.h"
 #include "PickupableObject.h"
 #include "Picture.generated.h"
@@ -47,19 +48,20 @@ private:
 	FPictureSettings PictureSettings;
 
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
-	TWeakObjectPtr<USplineMeshComponent> LastDrawnSlice;
 
 	TWeakObjectPtr<UMaterialInstanceDynamic> Material;
 
+	TWeakObjectPtr<USplineComponent> Spline;
+
 	bool IsAllowableSize() const;
 	bool IsAllowableAngle() const;
+	int32 GetPreviousPointIndex() const;
 	float GetAngle() const;
-	FVector GetNormalizedDirection(const USplineMeshComponent* SplineMesh) const;
-	void CalculateSplineTangentAndPositions(FVector PointLocation) const;
+	int32 GetCurrentPointIndex() const;
 
 	FTransform GetParentTransform() const;
 	void SetMaterial();
 	void CreateMaterial();
 	void SetStartAndEnd(const FSplineMeshInitializer& Initializer) const;
-	void CreateSplineMeshComponent(FVector RelativeLocation);
+	void CreateSplineMeshComponent();
 };

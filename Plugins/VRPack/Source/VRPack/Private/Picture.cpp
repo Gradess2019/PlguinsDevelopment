@@ -4,16 +4,26 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMaterialLibrary.h"
+#include "Components/SplineComponent.h"
 #include "Engine/StaticMesh.h"
+
+#define LOCAL_SPACE ESplineCoordinateSpace::Local
+#define WORLD_SPACE ESplineCoordinateSpace::World
 
 APicture::APicture(const FObjectInitializer& ObjectInitializer)
 {
 	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "RootSceneComponent");
+
+	Spline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, "SplineComponent");
+	Spline->SetupAttachment(RootComponent);
 }
 
 void APicture::InitializePicture(FPictureSettings PictureSettings)
 {
 	this->PictureSettings = PictureSettings;
+
+	Spline->SetLocationAtSplinePoint(1, FVector::ZeroVector, LOCAL_SPACE);
+	Spline->SetSplinePointType(1, ESplinePointType::Linear);
 }
 
 void APicture::UpdatePictureSettings(FPictureSettings PictureSettings)
@@ -35,94 +45,91 @@ void APicture::EnableCollision()
 
 void APicture::FinishFollowing()
 {
-	LastDrawnSlice = nullptr;
 	CurrentSlice = nullptr;
 }
 
 void APicture::Follow(FVector PointLocation)
 {
+	Spline->SetLocationAtSplinePoint(GetCurrentPointIndex(), PointLocation, LOCAL_SPACE);
 	if (!IsAllowableSize() || !IsAllowableAngle())
 	{
-		CalculateSplineTangentAndPositions(PointLocation);
 		CreateNewMesh(PointLocation);
+	} else if (CurrentSlice.IsValid())
+	{
+		const FVector NewEndLocation = Spline->GetLocationAtSplinePoint(GetCurrentPointIndex(), LOCAL_SPACE);
+		CurrentSlice->SetEndPosition(NewEndLocation);
 	}
-	CalculateSplineTangentAndPositions(PointLocation);
 }
 
 bool APicture::IsAllowableSize() const
 {
-	return (CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition()).Size() < PictureSettings.SliceSize;
+	const FVector PreviousLocation = Spline->GetLocationAtSplinePoint(GetPreviousPointIndex(), LOCAL_SPACE);
+	const FVector CurrentLocation = Spline->GetLocationAtSplinePoint(GetCurrentPointIndex(), LOCAL_SPACE);
+	return (PreviousLocation - CurrentLocation).Size() < PictureSettings.SliceSize;
 }
 
 bool APicture::IsAllowableAngle() const
 {
-	if (!LastDrawnSlice.IsValid()) return false;
 	if (CurrentSlice->GetEndPosition().Equals(FVector::ZeroVector, PictureSettings.SliceAngleTolerance)) return true;
 
 	return PictureSettings.AllowableAngle > GetAngle();
 }
 
+int32 APicture::GetPreviousPointIndex() const
+{
+	return GetCurrentPointIndex() - 1;
+}
+
 float APicture::GetAngle() const
 {
-	const FVector LastSplineDirection = GetNormalizedDirection(LastDrawnSlice.Get());
-	const FVector CurrentSplineDirection = GetNormalizedDirection(CurrentSlice.Get());
+	const FVector PreviousSplineDirection = UKismetMathLibrary::Normal(
+		Spline->GetDirectionAtSplinePoint(GetPreviousPointIndex(), WORLD_SPACE), 
+		PictureSettings.SliceAngleTolerance
+	);
 
-	const float DotProduct = UKismetMathLibrary::Dot_VectorVector(CurrentSplineDirection, LastSplineDirection);
+	const FVector CurrentSplineDirection = UKismetMathLibrary::Normal(
+		CurrentSlice->GetStartTangent(),
+		PictureSettings.SliceAngleTolerance
+	);
+
+	const float DotProduct = UKismetMathLibrary::Dot_VectorVector(PreviousSplineDirection, CurrentSplineDirection);
 	return UKismetMathLibrary::DegAcos(DotProduct);
 }
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
-FVector APicture::GetNormalizedDirection(const USplineMeshComponent* SplineMesh) const
+int32 APicture::GetCurrentPointIndex() const
 {
-	return UKismetMathLibrary::Normal(SplineMesh->GetEndPosition() - SplineMesh->GetStartPosition());
-}
-
-void APicture::CalculateSplineTangentAndPositions(FVector PointLocation) const
-{
-	const FVector EndPosition = UKismetMathLibrary::InverseTransformLocation(
-		CurrentSlice->GetComponentTransform(), PointLocation
-	);
-	
-	const FVector EndTangent = CurrentSlice->GetEndPosition() - CurrentSlice->GetStartPosition();
-
-	if (!LastDrawnSlice.IsValid())
-	{
-		CurrentSlice->SetStartTangent(EndTangent);
-	}
-
-	CurrentSlice->SetEndTangent(EndTangent);
-	CurrentSlice->SetEndPosition(EndPosition);
+	return Spline->GetNumberOfSplinePoints() - 1;
 }
 
 void APicture::CreateNewMesh(FVector PointLocation)
 {
-	const FTransform ParentTransform = GetParentTransform();
-	const FVector LocalPointPositition = UKismetMathLibrary::InverseTransformLocation(ParentTransform, PointLocation);
-
-	FSplineMeshInitializer Initializer;
-	FVector RelativeLocation;
-
 	if (CurrentSlice.IsValid())
 	{
-		RelativeLocation = CurrentSlice->GetEndPosition() + CurrentSlice->RelativeLocation;
-
-		Initializer = FSplineMeshInitializer(
-			FVector::ZeroVector,
-			CurrentSlice->GetEndTangent(),
-			LocalPointPositition,
-			LocalPointPositition
-		);
-		
-		LastDrawnSlice = CurrentSlice;
-	}
-	else
+		const FVector EndPosition = Spline->GetLocationAtSplinePoint(GetCurrentPointIndex(), LOCAL_SPACE);
+		CurrentSlice->SetEndPosition(EndPosition, false);
+		const FVector EndTangent = Spline->GetTangentAtSplinePoint(GetPreviousPointIndex(), WORLD_SPACE);
+		CurrentSlice->SetEndTangent(EndTangent);
+	} else
 	{
-		RelativeLocation = LocalPointPositition;
+		Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
+		Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
 	}
 
-	CreateSplineMeshComponent(RelativeLocation);
+	CreateSplineMeshComponent();
+
+	FVector InitialPosition = Spline->GetLocationAtSplinePoint(GetCurrentPointIndex(), LOCAL_SPACE);
+	FVector InitialTangent = Spline->GetTangentAtSplinePoint(GetPreviousPointIndex(), WORLD_SPACE);
+	FSplineMeshInitializer Initializer = FSplineMeshInitializer(
+		InitialPosition,
+		InitialTangent,
+		InitialPosition,
+		InitialTangent
+	);
+
 	SetStartAndEnd(Initializer);
-	UE_LOG(LogTemp, Warning, TEXT("New mesh was created"));
+
+	Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
+	Spline->SetSplinePointType(GetCurrentPointIndex(), ESplinePointType::Linear);
 }
 
 FTransform APicture::GetParentTransform() const
@@ -132,13 +139,12 @@ FTransform APicture::GetParentTransform() const
 		       : GetActorTransform();
 }
 
-void APicture::CreateSplineMeshComponent(FVector RelativeLocation)
+void APicture::CreateSplineMeshComponent()
 {
 	CurrentSlice = NewObject<USplineMeshComponent>(this);
 	CurrentSlice->SetMobility(EComponentMobility::Movable);
 	CurrentSlice->RegisterComponent();
 	CurrentSlice->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
-	CurrentSlice->SetRelativeLocation(RelativeLocation);
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
 	CurrentSlice->SetCollisionProfileName("NoCollision");
