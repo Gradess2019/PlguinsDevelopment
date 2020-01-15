@@ -38,6 +38,9 @@ public:
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
+	TSubclassOf<APicture> PictureClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	FTimelineSettings TimelineSettings;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")

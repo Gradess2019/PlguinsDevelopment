@@ -53,7 +53,7 @@ void UPaintComponent::StartDrawing()
 		FActorSpawnParameters Parameters;
 		Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		Parameters.Owner = GetOwner();
-		CurrentPicture = GetWorld()->SpawnActor<APicture>(Parameters);
+		CurrentPicture = GetWorld()->SpawnActor<APicture>(PictureClass, Parameters);
 		CurrentPicture->SetActorLocation(GetComponentLocation());
 		CurrentPicture->InitializePicture(PictureSettings);
 	}

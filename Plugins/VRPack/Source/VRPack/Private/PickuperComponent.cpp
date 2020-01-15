@@ -29,10 +29,13 @@ void UPickuperComponent::Pickup()
 	UVRPackFunctionLibrary::AppendArray<UObject, UPrimitiveComponent>(OverlappingObjects, OverlappingComponents);
 	UVRPackFunctionLibrary::AppendArray<UObject, AActor>(OverlappingObjects, OverlappingActors);
 
-	if (OverlappingObjects[0]->Implements<UPickupableObject>())
+	for (UObject* Element : OverlappingObjects)
 	{
-		PickupedObject = OverlappingObjects[0];
+		if (!Element->Implements<UPickupableObject>()) { continue; }
+
+		PickupedObject = Element;
 		IPickupableObject::Execute_OnAttach(PickupedObject.Get(), this);
+		return;
 	}
 }
 
