@@ -9,7 +9,7 @@
 /**
  * Use such as eraser for picture
  */
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class VRPACK_API UEraserComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()

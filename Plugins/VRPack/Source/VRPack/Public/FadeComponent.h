@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFadeInFinished);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFadeOutStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFadeOutFinished);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class VRPACK_API UFadeComponent : public UActorComponent
 {
 	GENERATED_BODY()

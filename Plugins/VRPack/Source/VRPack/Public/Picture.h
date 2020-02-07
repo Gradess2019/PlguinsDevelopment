@@ -10,7 +10,7 @@
 #include "PickupableObject.h"
 #include "Picture.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class VRPACK_API APicture : public AActor, public IPickupableObject
 {
 	GENERATED_BODY()

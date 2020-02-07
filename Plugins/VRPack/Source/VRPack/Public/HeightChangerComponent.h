@@ -7,7 +7,7 @@
 #include "HeightChangerComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class VRPACK_API UHeightChangerComponent : public UActorComponent
 {
 	GENERATED_BODY()

@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTeleportation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartProjection);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopProjection);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class VRPACK_API UTeleportComponent : public UMotionControllerComponent
 {
 	GENERATED_BODY()
