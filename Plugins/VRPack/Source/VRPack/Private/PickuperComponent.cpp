@@ -43,6 +43,11 @@ void UPickuperComponent::Throw()
 {
 	if (!PickupedObject.IsValid()) return;
 	IPickupableObject::Execute_OnDetach(PickupedObject.Get());
+	IInvalidator::Execute_Invalidate(this);
+}
+
+void UPickuperComponent::Invalidate_Implementation()
+{
 	PickupedObject = nullptr;
 }
 

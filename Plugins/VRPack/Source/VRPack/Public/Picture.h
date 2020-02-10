@@ -44,7 +44,7 @@ public:
 	void OnDetach_Implementation() override;
 	
 private:
-
+	
 	FPictureSettings PictureSettings;
 
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;

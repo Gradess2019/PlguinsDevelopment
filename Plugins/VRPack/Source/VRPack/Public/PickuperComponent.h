@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Invalidator.h"
 #include "VRPackStructs.h"
 #include "PickuperComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
-class VRPACK_API UPickuperComponent : public UBoxComponent
+class VRPACK_API UPickuperComponent : public UBoxComponent, public IInvalidator
 {
 	GENERATED_BODY()
 
@@ -23,6 +24,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Pickuper Component")
 	void Throw();
+
+	void Invalidate_Implementation() override;
 
 private:
 
