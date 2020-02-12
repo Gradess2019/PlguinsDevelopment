@@ -3,9 +3,10 @@
 
 #include "AttachableStaticMeshComponent.h"
 
-void UAttachableStaticMeshComponent::OnAttach_Implementation(USceneComponent* Parent)
+bool UAttachableStaticMeshComponent::OnAttach_Implementation(USceneComponent* Parent)
 {
 	OnAttached.Broadcast(Parent);
+	return true;
 }
 
 void UAttachableStaticMeshComponent::OnDetach_Implementation()

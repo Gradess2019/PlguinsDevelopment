@@ -187,9 +187,10 @@ void APicture::SetVisible(bool bVisible)
 	this->SetActorHiddenInGame(!bVisible);
 }
 
-void APicture::OnAttach_Implementation(USceneComponent* Parent)
+bool APicture::OnAttach_Implementation(USceneComponent* Parent)
 {
 	AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+	return true;
 }
 
 void APicture::OnDetach_Implementation()

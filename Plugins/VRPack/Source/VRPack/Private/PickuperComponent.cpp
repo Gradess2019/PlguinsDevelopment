@@ -33,9 +33,11 @@ void UPickuperComponent::Pickup()
 	{
 		if (!Element->Implements<UPickupableObject>()) { continue; }
 
-		PickupedObject = Element;
-		IPickupableObject::Execute_OnAttach(PickupedObject.Get(), this);
-		return;
+		if (IPickupableObject::Execute_OnAttach(Element, this))
+		{
+			PickupedObject = Element;
+			return;
+		}
 	}
 }
 

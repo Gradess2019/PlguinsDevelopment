@@ -24,7 +24,7 @@ class VRPACK_API IPickupableObject
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Puckupable Object")
-	void OnAttach(USceneComponent* Parent);
+	bool OnAttach(USceneComponent* Parent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Puckupable Object")
 	void OnDetach();

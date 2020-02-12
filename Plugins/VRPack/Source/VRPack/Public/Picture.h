@@ -40,7 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void SetVisible(bool bVisible);
 
-	void OnAttach_Implementation(USceneComponent* Parent) override;
+	bool OnAttach_Implementation(USceneComponent* Parent) override;
 	void OnDetach_Implementation() override;
 	
 private:

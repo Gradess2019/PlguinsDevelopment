@@ -23,7 +23,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Attachable Component")
 	FOnDetached OnDetached;
 	
-	void OnAttach_Implementation(USceneComponent* Parent) override;
+	bool OnAttach_Implementation(USceneComponent* Parent) override;
 	
 	void OnDetach_Implementation() override;
 	
