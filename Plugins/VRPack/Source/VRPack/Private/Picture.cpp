@@ -148,6 +148,7 @@ void APicture::CreateSplineMeshComponent()
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
 	CurrentSlice->SetCollisionProfileName("NoCollision");
+	CurrentSlice->SetIsReplicated(true);
 
 	const FVector2D Scale = FVector2D(PictureSettings.Width, PictureSettings.Width);
 	CurrentSlice->SetStartScale(Scale);
