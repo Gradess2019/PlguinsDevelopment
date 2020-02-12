@@ -114,3 +114,8 @@ APicture* UPaintComponent::GetCurrentPicture()
 {
 	return CurrentPicture.Get();
 }
+
+bool UPaintComponent::IsDrawing()
+{
+	return DrawingTimeline->IsPlaying();
+}

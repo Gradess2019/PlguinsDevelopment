@@ -39,8 +39,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void SetLineColor(const FLinearColor& NewColor);
 
-	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Paint component")
 	APicture* GetCurrentPicture();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Paint component")
+	bool IsDrawing();
 	
 private:
 
