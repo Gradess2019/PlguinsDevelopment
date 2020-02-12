@@ -9,6 +9,7 @@
 #include "Picture.h"
 #include "PaintComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinsihDrawing);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class VRPACK_API UPaintComponent : public USceneComponent
@@ -18,6 +19,9 @@ class VRPACK_API UPaintComponent : public USceneComponent
 public:
 
 	UPaintComponent(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintAssignable, Category = "Paint component")
+	FOnFinsihDrawing OnFinsihDrawing;
 
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void StartDrawing();
@@ -34,6 +38,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void SetLineColor(const FLinearColor& NewColor);
+
+	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	APicture* GetCurrentPicture();
 	
 private:
 

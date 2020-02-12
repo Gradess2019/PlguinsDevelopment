@@ -87,6 +87,8 @@ void UPaintComponent::FinishDrawing()
 	if (!CurrentPicture.IsValid()) { return; }
 	CurrentPicture->EnableCollision();
 	CurrentPicture = nullptr;
+
+	OnFinsihDrawing.Broadcast();
 }
 
 void UPaintComponent::SetLineWidth(float NewWidth)
@@ -106,4 +108,9 @@ void UPaintComponent::SetLineColor(const FLinearColor& NewColor)
 {
 	PictureSettings.Color = NewColor;
 	UpdatePictureSettings();
+}
+
+APicture* UPaintComponent::GetCurrentPicture()
+{
+	return CurrentPicture.Get();
 }
