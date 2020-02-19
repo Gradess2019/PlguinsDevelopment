@@ -42,13 +42,13 @@ void UPaintComponent::OnUpdatePaint()
 	CurrentPicture->Follow(this->GetComponentLocation());
 }
 
-void UPaintComponent::StartDrawing()
+void UPaintComponent::StartDrawing_Implementation()
 {
 #if !UE_BUILD_SHIPPING
-	if (!DrawingTimeline.IsValid()) checkNoEntry();
+	if (!IsValid(DrawingTimeline)) checkNoEntry();
 #endif
 
-	if (!CurrentPicture.IsValid())
+	if (!IsValid(CurrentPicture))
 	{
 		FActorSpawnParameters Parameters;
 		Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -62,7 +62,7 @@ void UPaintComponent::StartDrawing()
 
 	
 #if !UE_BUILD_SHIPPING
-	if (!CurrentPicture.IsValid()) checkNoEntry();
+	if (!IsValid(CurrentPicture)) checkNoEntry();
 #endif
 	
 	DrawingTimeline->PlayFromStart();
@@ -71,12 +71,12 @@ void UPaintComponent::StartDrawing()
 void UPaintComponent::StopDrawing()
 {
 #if !UE_BUILD_SHIPPING
-	if (!DrawingTimeline.IsValid()) checkNoEntry();
+	if (!IsValid(DrawingTimeline)) checkNoEntry();
 #endif
 
 	DrawingTimeline->Stop();
 
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->FinishFollowing();
 }
 
@@ -84,7 +84,7 @@ void UPaintComponent::FinishDrawing()
 {
 	DrawingTimeline->Stop();
 
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->EnableCollision();
 	CurrentPicture = nullptr;
 
@@ -100,7 +100,7 @@ void UPaintComponent::SetLineWidth(float NewWidth)
 // TODO may Observer design pattern would be better?
 void UPaintComponent::UpdatePictureSettings() const
 {
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->UpdatePictureSettings(PictureSettings);
 }
 
@@ -112,7 +112,7 @@ void UPaintComponent::SetLineColor(const FLinearColor& NewColor)
 
 APicture* UPaintComponent::GetCurrentPicture()
 {
-	return CurrentPicture.Get();
+	return CurrentPicture;
 }
 
 bool UPaintComponent::IsDrawing()

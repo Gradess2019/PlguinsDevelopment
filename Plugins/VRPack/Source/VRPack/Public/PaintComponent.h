@@ -23,8 +23,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Paint component")
 	FOnFinsihDrawing OnFinsihDrawing;
 
-	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Paint component")
 	void StartDrawing();
+
+	void virtual StartDrawing_Implementation();
 	
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void StopDrawing();
@@ -44,6 +46,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Paint component")
 	bool IsDrawing();
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Paint component")
+	FPictureSettings PictureSettings;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Paint component")
+	UTimelineComponent* DrawingTimeline;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Paint component")
+	APicture* CurrentPicture;
 	
 private:
 
@@ -53,12 +66,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	FTimelineSettings TimelineSettings;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
-	FPictureSettings PictureSettings;
 	
-	TWeakObjectPtr<UTimelineComponent> DrawingTimeline;
-
-	TWeakObjectPtr<APicture> CurrentPicture;
 
 	void InitializeComponent() override;
 	void InitializeDrawingTimeline();
