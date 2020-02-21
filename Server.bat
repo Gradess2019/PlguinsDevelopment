@@ -1,0 +1,1 @@
+"D:\UE4\UE_4.22\Engine\Binaries\Win64\UE4Editor.exe" "D:\UE4\Projects\PluginsDevelopment\PluginsDevelopment.uproject" TestingMap -server -log -nosteam

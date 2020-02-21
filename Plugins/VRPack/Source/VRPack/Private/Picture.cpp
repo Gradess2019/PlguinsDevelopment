@@ -6,6 +6,7 @@
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Components/SplineComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Net/UnrealNetwork.h"
 
 #define LOCAL_SPACE ESplineCoordinateSpace::Local
 #define WORLD_SPACE ESplineCoordinateSpace::World
@@ -13,12 +14,23 @@
 APicture::APicture(const FObjectInitializer& ObjectInitializer)
 {
 	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "RootSceneComponent");
-
-	Spline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, "SplineComponent");
-	Spline->SetupAttachment(RootComponent);
+	
+	bReplicates = true;
 }
 
-void APicture::InitializePicture(FPictureSettings PictureSettings)
+void APicture::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (IsValid(Spline)) { return; }
+	
+	Spline = NewObject<USplineComponent>(this, "SplineComponent");
+	Spline->RegisterComponent();
+	Spline->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Spline->SetRelativeLocation(FVector::ZeroVector);
+}
+
+void APicture::InitializePicture_Implementation(FPictureSettings PictureSettings)
 {
 	this->PictureSettings = PictureSettings;
 
@@ -167,6 +179,7 @@ void APicture::SetMaterial()
 
 void APicture::CreateMaterial()
 {
+	if (!IsValid(PictureSettings.StaticMesh)) { return; }
 	UMaterialInterface* SourceMaterial = PictureSettings.StaticMesh->GetMaterial(0);
 	Material = UKismetMaterialLibrary::CreateDynamicMaterialInstance(this, SourceMaterial);
 	Material->SetVectorParameterValue("Color", PictureSettings.Color);
@@ -196,4 +209,13 @@ bool APicture::OnAttach_Implementation(USceneComponent* Parent)
 void APicture::OnDetach_Implementation()
 {
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+
+
+void APicture::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(APicture, PictureSettings);
 }
