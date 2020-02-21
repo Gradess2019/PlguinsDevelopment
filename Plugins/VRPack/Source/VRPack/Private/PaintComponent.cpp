@@ -4,11 +4,13 @@
 #include "Components/TimelineComponent.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 UPaintComponent::UPaintComponent(const FObjectInitializer& ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 	TimelineSettings.Loop = true;
+	bReplicates = true;
 }
 
 void UPaintComponent::InitializeComponent()
@@ -80,7 +82,7 @@ void UPaintComponent::StopDrawing()
 	CurrentPicture->FinishFollowing();
 }
 
-void UPaintComponent::FinishDrawing()
+void UPaintComponent::FinishDrawing_Implementation()
 {
 	DrawingTimeline->Stop();
 
@@ -118,4 +120,15 @@ APicture* UPaintComponent::GetCurrentPicture()
 bool UPaintComponent::IsDrawing()
 {
 	return DrawingTimeline->IsPlaying();
+}
+
+void UPaintComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UPaintComponent, CurrentPicture);
+}
+
+void UPaintComponent::OnRep_SetCurrentPicture()
+{
+	DoRep_CurrentPicture();
 }

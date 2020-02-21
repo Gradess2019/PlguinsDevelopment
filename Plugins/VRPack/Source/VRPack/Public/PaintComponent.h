@@ -20,7 +20,7 @@ public:
 
 	UPaintComponent(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(BlueprintAssignable, Category = "Paint component")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Paint component")
 	FOnFinsihDrawing OnFinsihDrawing;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Paint component")
@@ -31,8 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void StopDrawing();
 
-	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Paint component")
 	void FinishDrawing();
+	virtual void FinishDrawing_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = "Paint component")
 	void SetLineWidth(float NewWidth);
@@ -55,9 +56,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Paint component")
 	UTimelineComponent* DrawingTimeline;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Paint component")
+	UPROPERTY(BlueprintReadWrite, ReplicatedUsing=OnRep_SetCurrentPicture, Category = "Paint component")
 	APicture* CurrentPicture;
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Paint component")
+	void OnRep_SetCurrentPicture();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Paint component")
+	void DoRep_CurrentPicture();
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
@@ -65,8 +72,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Paint component")
 	FTimelineSettings TimelineSettings;
-
-	
 
 	void InitializeComponent() override;
 	void InitializeDrawingTimeline();

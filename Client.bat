@@ -1,0 +1,1 @@
+"D:\UE4\UE_4.22\Engine\Binaries\Win64\UE4Editor.exe" "D:\UE4\Projects\PluginsDevelopment\PluginsDevelopment.uproject" 10.0.0.12 -game -ResX=800 -ResY=900 -WinX=0 -WinY=20 -log -nosteam -vr
