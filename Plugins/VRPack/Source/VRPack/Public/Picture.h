@@ -19,8 +19,9 @@ public:
 
 	APicture(const FObjectInitializer& ObjectInitializer);
 	
-	UFUNCTION(BlueprintCallable, Category = "Picture")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Picture")
 	void InitializePicture(FPictureSettings PictureSettings);
+	virtual void InitializePicture_Implementation(FPictureSettings PictureSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void UpdatePictureSettings(FPictureSettings PictureSettings);
@@ -40,18 +41,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void SetVisible(bool bVisible);
 
-	void OnAttach_Implementation(USceneComponent* Parent) override;
+	bool OnAttach_Implementation(USceneComponent* Parent) override;
 	void OnDetach_Implementation() override;
-	
-private:
-	
+
+protected:
+
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Picture")
 	FPictureSettings PictureSettings;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Picture")
+	USplineComponent* Spline;
+
+	UFUNCTION()
+	void BeginPlay() override;
+
+private:
+
+	UPROPERTY()
 	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
 
+	UPROPERTY()
 	TWeakObjectPtr<UMaterialInstanceDynamic> Material;
-
-	TWeakObjectPtr<USplineComponent> Spline;
 
 	bool IsAllowableSize() const;
 	bool IsAllowableAngle() const;

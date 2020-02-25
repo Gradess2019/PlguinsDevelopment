@@ -4,11 +4,13 @@
 #include "Components/TimelineComponent.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 UPaintComponent::UPaintComponent(const FObjectInitializer& ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 	TimelineSettings.Loop = true;
+	bReplicates = true;
 }
 
 void UPaintComponent::InitializeComponent()
@@ -42,13 +44,13 @@ void UPaintComponent::OnUpdatePaint()
 	CurrentPicture->Follow(this->GetComponentLocation());
 }
 
-void UPaintComponent::StartDrawing()
+void UPaintComponent::StartDrawing_Implementation()
 {
 #if !UE_BUILD_SHIPPING
-	if (!DrawingTimeline.IsValid()) checkNoEntry();
+	if (!IsValid(DrawingTimeline)) checkNoEntry();
 #endif
 
-	if (!CurrentPicture.IsValid())
+	if (!IsValid(CurrentPicture))
 	{
 		FActorSpawnParameters Parameters;
 		Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -62,7 +64,7 @@ void UPaintComponent::StartDrawing()
 
 	
 #if !UE_BUILD_SHIPPING
-	if (!CurrentPicture.IsValid()) checkNoEntry();
+	if (!IsValid(CurrentPicture)) checkNoEntry();
 #endif
 	
 	DrawingTimeline->PlayFromStart();
@@ -71,22 +73,24 @@ void UPaintComponent::StartDrawing()
 void UPaintComponent::StopDrawing()
 {
 #if !UE_BUILD_SHIPPING
-	if (!DrawingTimeline.IsValid()) checkNoEntry();
+	if (!IsValid(DrawingTimeline)) checkNoEntry();
 #endif
 
 	DrawingTimeline->Stop();
 
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->FinishFollowing();
 }
 
-void UPaintComponent::FinishDrawing()
+void UPaintComponent::FinishDrawing_Implementation()
 {
 	DrawingTimeline->Stop();
 
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->EnableCollision();
 	CurrentPicture = nullptr;
+
+	OnFinsihDrawing.Broadcast();
 }
 
 void UPaintComponent::SetLineWidth(float NewWidth)
@@ -98,7 +102,7 @@ void UPaintComponent::SetLineWidth(float NewWidth)
 // TODO may Observer design pattern would be better?
 void UPaintComponent::UpdatePictureSettings() const
 {
-	if (!CurrentPicture.IsValid()) { return; }
+	if (!IsValid(CurrentPicture)) { return; }
 	CurrentPicture->UpdatePictureSettings(PictureSettings);
 }
 
@@ -106,4 +110,25 @@ void UPaintComponent::SetLineColor(const FLinearColor& NewColor)
 {
 	PictureSettings.Color = NewColor;
 	UpdatePictureSettings();
+}
+
+APicture* UPaintComponent::GetCurrentPicture()
+{
+	return CurrentPicture;
+}
+
+bool UPaintComponent::IsDrawing()
+{
+	return DrawingTimeline->IsPlaying();
+}
+
+void UPaintComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UPaintComponent, CurrentPicture);
+}
+
+void UPaintComponent::OnRep_SetCurrentPicture()
+{
+	DoRep_CurrentPicture();
 }

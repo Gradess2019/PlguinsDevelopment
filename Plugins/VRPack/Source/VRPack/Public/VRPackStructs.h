@@ -96,7 +96,7 @@ struct FPictureSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
 	FName CollisionPreset;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Picture settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
 	UStaticMesh* StaticMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Picture settings")
