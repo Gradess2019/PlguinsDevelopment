@@ -142,6 +142,8 @@ void APicture::CreateNewMesh(FVector PointLocation)
 
 	Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
 	Spline->SetSplinePointType(GetCurrentPointIndex(), ESplinePointType::Linear);
+
+	OnMeshCreated.Broadcast(CurrentSlice.Get());
 }
 
 FTransform APicture::GetParentTransform() const
@@ -153,10 +155,11 @@ FTransform APicture::GetParentTransform() const
 
 void APicture::CreateSplineMeshComponent()
 {
-	CurrentSlice = NewObject<USplineMeshComponent>(this);
-	CurrentSlice->SetMobility(EComponentMobility::Movable);
+	CurrentSlice = NewObject<UReplicatedSplineMeshComponent>(this);
 	CurrentSlice->RegisterComponent();
+	CurrentSlice->InitializeComponent();
 	CurrentSlice->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+<<<<<<< Updated upstream
 	CurrentSlice->SetStaticMesh(PictureSettings.StaticMesh);
 	CurrentSlice->SetCastShadow(PictureSettings.CastShadow);
 	CurrentSlice->SetCollisionProfileName("NoCollision");
@@ -165,6 +168,9 @@ void APicture::CreateSplineMeshComponent()
 	CurrentSlice->SetStartScale(Scale);
 	CurrentSlice->SetEndScale(Scale);
 
+=======
+	CurrentSlice->ApplyPictureSettings(PictureSettings);
+>>>>>>> Stashed changes
 	SetMaterial();
 }
 
@@ -210,8 +216,6 @@ void APicture::OnDetach_Implementation()
 {
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
-
-
 
 void APicture::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {

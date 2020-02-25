@@ -8,7 +8,10 @@
 #include "Components/SplineComponent.h"
 #include "VRPackStructs.h"
 #include "PickupableObject.h"
+#include "ReplicatedSplineMeshComponent.h"
 #include "Picture.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMeshCreated, USplineMeshComponent*, NewSplineMesh);
 
 UCLASS(Blueprintable)
 class VRPACK_API APicture : public AActor, public IPickupableObject
@@ -18,6 +21,9 @@ class VRPACK_API APicture : public AActor, public IPickupableObject
 public:
 
 	APicture(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category  = "Picture")
+	FOnMeshCreated OnMeshCreated;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Picture")
 	void InitializePicture(FPictureSettings PictureSettings);
@@ -58,7 +64,7 @@ protected:
 private:
 
 	UPROPERTY()
-	TWeakObjectPtr<USplineMeshComponent> CurrentSlice;
+	TWeakObjectPtr<UReplicatedSplineMeshComponent> CurrentSlice;
 
 	UPROPERTY()
 	TWeakObjectPtr<UMaterialInstanceDynamic> Material;
