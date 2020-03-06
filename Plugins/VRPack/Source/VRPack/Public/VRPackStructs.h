@@ -170,12 +170,12 @@ struct FStaticMeshData
 		SaveData(Component);
 	}
 
-	void SaveData(UStaticMeshComponent* Component)
+	void SaveData(UStaticMeshComponent* ComponentToSave)
 	{
-		this->Component = Component;
-		SimulatePhysics = Component->IsSimulatingPhysics();
-		CollisionProfileName = Component->GetCollisionProfileName();
-		ResponseData = Component->GetCollisionResponseToChannels();
+		this->Component = ComponentToSave;
+		SimulatePhysics = ComponentToSave->IsSimulatingPhysics();
+		CollisionProfileName = ComponentToSave->GetCollisionProfileName();
+		ResponseData = ComponentToSave->GetCollisionResponseToChannels();
 	}
 
 	void ApplySavedData() const

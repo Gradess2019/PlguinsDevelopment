@@ -26,7 +26,7 @@ void UHeightChangerComponent::SetCustomHeight(float NewHeight)
 {
 	NewHeight = UKismetMathLibrary::FClamp(NewHeight, MinHeight, MaxHeight);
 
-	const FVector ComponentLocation = TargetComponent->RelativeLocation;
+	const FVector ComponentLocation = TargetComponent->GetRelativeLocation();
 	const FVector TargetLocation = FVector(ComponentLocation.X, ComponentLocation.Y, NewHeight - HeightCoefficient);
 
 	TargetComponent->SetRelativeLocation(TargetLocation);
@@ -66,7 +66,7 @@ void UHeightChangerComponent::BeginPlay()
 
 	if (TargetComponent.IsValid())
 	{
-		SetCustomHeight(TargetComponent->RelativeLocation.Z + HeightCoefficient);
+		SetCustomHeight(TargetComponent->GetRelativeLocation().Z + HeightCoefficient);
 	} else
 	{
 		checkNoEntry();
