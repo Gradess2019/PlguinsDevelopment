@@ -10,6 +10,8 @@
 #include "PickupableObject.h"
 #include "Picture.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMeshCreated, USplineMeshComponent*, NewMesh);
+
 UCLASS(Blueprintable)
 class VRPACK_API APicture : public AActor, public IPickupableObject
 {
@@ -18,6 +20,9 @@ class VRPACK_API APicture : public AActor, public IPickupableObject
 public:
 
 	APicture(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Picture")
+	FOnMeshCreated OnMeshCreated;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Picture")
 	void InitializePicture(FPictureSettings PictureSettings);

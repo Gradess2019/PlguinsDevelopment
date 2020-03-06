@@ -121,6 +121,7 @@ void APicture::CreateNewMesh(FVector PointLocation)
 		CurrentSlice->SetEndPosition(EndPosition, false);
 		const FVector EndTangent = Spline->GetTangentAtSplinePoint(GetPreviousPointIndex(), WORLD_SPACE);
 		CurrentSlice->SetEndTangent(EndTangent);
+		OnMeshCreated.Broadcast(CurrentSlice.Get());
 	} else
 	{
 		Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
@@ -142,6 +143,7 @@ void APicture::CreateNewMesh(FVector PointLocation)
 
 	Spline->AddSplinePoint(PointLocation, LOCAL_SPACE);
 	Spline->SetSplinePointType(GetCurrentPointIndex(), ESplinePointType::Linear);
+
 }
 
 FTransform APicture::GetParentTransform() const
