@@ -24,19 +24,19 @@ public:
 
 	UTeleportComponent(const FObjectInitializer& OBJECT_INITIALIZER);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Teleport settings")
 	void StartTeleportProjection();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Teleport settings")
 	void Teleport();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Teleport settings")
 	void StopTeleportProjection();
 
 	/*
 	 * Used for binding to delegates
 	 */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Teleport settings")
 	void SetOwnerLocation();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintAssignable, Category = "Teleport settings")

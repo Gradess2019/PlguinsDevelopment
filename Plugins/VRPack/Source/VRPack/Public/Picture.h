@@ -25,11 +25,11 @@ public:
 	FOnMeshCreated OnMeshCreated;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Picture")
-	void InitializePicture(FPictureSettings PictureSettings);
-	virtual void InitializePicture_Implementation(FPictureSettings PictureSettings);
+	void InitializePicture(FPictureSettings NewPictureSettings);
+	virtual void InitializePicture_Implementation(FPictureSettings NewPictureSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Picture")
-	void UpdatePictureSettings(FPictureSettings PictureSettings);
+	void UpdatePictureSettings(FPictureSettings NewPictureSettings);
 	
 	UFUNCTION(BlueprintCallable, Category = "Picture")
 	void EnableCollision();

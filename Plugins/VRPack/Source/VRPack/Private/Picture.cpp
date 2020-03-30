@@ -30,17 +30,17 @@ void APicture::BeginPlay()
 	Spline->SetRelativeLocation(FVector::ZeroVector);
 }
 
-void APicture::InitializePicture_Implementation(FPictureSettings PictureSettings)
+void APicture::InitializePicture_Implementation(FPictureSettings NewPictureSettings)
 {
-	this->PictureSettings = PictureSettings;
+	this->PictureSettings = NewPictureSettings;
 
 	Spline->SetLocationAtSplinePoint(1, FVector::ZeroVector, LOCAL_SPACE);
 	Spline->SetSplinePointType(1, ESplinePointType::Linear);
 }
 
-void APicture::UpdatePictureSettings(FPictureSettings PictureSettings)
+void APicture::UpdatePictureSettings(FPictureSettings NewPictureSettings)
 {
-	this->PictureSettings = PictureSettings;
+	this->PictureSettings = NewPictureSettings;
 	CreateMaterial();
 }
 

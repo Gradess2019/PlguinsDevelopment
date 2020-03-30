@@ -17,16 +17,16 @@ UPickuperComponent::UPickuperComponent()
 void UPickuperComponent::Pickup()
 {
 	TArray<AActor*> OverlappingActors;
-	TArray<UPrimitiveComponent*> OverlappingComponents;
+	TArray<UPrimitiveComponent*> CurrentOverlappingComponents;
 
 	this->GetOverlappingActors(OverlappingActors);
-	this->GetOverlappingComponents(OverlappingComponents);
+	this->GetOverlappingComponents(CurrentOverlappingComponents);
 
-	if (OverlappingActors.Num() == 0 && OverlappingComponents.Num() == 0) { return; }
+	if (OverlappingActors.Num() == 0 && CurrentOverlappingComponents.Num() == 0) { return; }
 
 	TArray<UObject*> OverlappingObjects;
 
-	UVRPackFunctionLibrary::AppendArray<UObject, UPrimitiveComponent>(OverlappingObjects, OverlappingComponents);
+	UVRPackFunctionLibrary::AppendArray<UObject, UPrimitiveComponent>(OverlappingObjects, CurrentOverlappingComponents);
 	UVRPackFunctionLibrary::AppendArray<UObject, AActor>(OverlappingObjects, OverlappingActors);
 
 	for (UObject* Element : OverlappingObjects)
