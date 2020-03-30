@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.24",
+	"EngineAssociation": "{E259FE56-48B5-6755-F255-43B16756667E}",
 	"Category": "",
 	"Description": "",
 	"Enterprise": true,
@@ -47,7 +47,6 @@
 		}
 	],
 	"TargetPlatforms": [
-		"LinuxNoEditor",
 		"WindowsNoEditor"
 	]
 }

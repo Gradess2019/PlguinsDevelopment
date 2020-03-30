@@ -10,7 +10,7 @@ UPaintComponent::UPaintComponent(const FObjectInitializer& ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 	TimelineSettings.Loop = true;
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 }
 
 void UPaintComponent::InitializeComponent()
